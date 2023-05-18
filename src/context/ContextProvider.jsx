@@ -52,6 +52,7 @@ const initialState = {
     dateOfBirth: "",
     birthPlace: "",
     event_id: "",
+    cotestant_number: "",
   },
 };
 

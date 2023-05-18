@@ -35,9 +35,9 @@ import { useValue } from "../../context/ContextProvider";
 import actionHelper from "../../context/actionHelper";
 
 const AddEditScore = ({ openEvent, handleCloseEvent }) => {
-  const [startDate, setStartDate] = useState(dayjs());
+  const [categories, setCategories] = useState([{}]);
   const [contestants, setContestants] = useState([{}]);
-  const [categories, setCategories] = useState([]);
+  const [scores, setScores] = useState([{}]);
 
   const tableRef = useRef();
 
@@ -49,31 +49,53 @@ const AddEditScore = ({ openEvent, handleCloseEvent }) => {
   const actions = actionHelper();
 
   useEffect(() => {
-    // fetch();
+    fetch();
   }, []);
 
   const fetch = async () => {
-    // dispatch({ type: actions.START_LOADING });
     const [resContestant, resCategories, resScore] = await Promise.all([
       indexContestants(),
       indexCategories(),
       indexScores(),
     ]);
 
-    console.log(resContestant);
-
     const combinedData = resContestant.map((contestant) => {
-      const scores = resScore.filter(
+      const contestantScores = resScore.filter(
         (score) => score.contestant_id === contestant.id
       );
-      return { ...contestant, scores };
+
+      const categoryScores = {};
+
+      contestantScores.forEach((score) => {
+        const categoryId = score.category_id;
+
+        if (!categoryScores[categoryId]) {
+          categoryScores[categoryId] = {
+            category_id: categoryId,
+            scores: [],
+            totalScore: 0,
+          };
+        }
+
+        categoryScores[categoryId].scores.push({
+          score_id: score.id,
+          judge: score.judge_id,
+          score: score.score,
+        });
+
+        categoryScores[categoryId].totalScore += parseInt(score.score);
+      });
+
+      const categories = Object.values(categoryScores);
+
+      return {
+        ...contestant,
+        categories,
+      };
     });
 
-    console.log(combinedData);
-
-    setContestants(resContestant);
+    setContestants(combinedData);
     setCategories(resCategories);
-    // dispatch({ type: actions.END_LOADING });
   };
 
   const handlePrint = useReactToPrint({
@@ -96,26 +118,61 @@ const AddEditScore = ({ openEvent, handleCloseEvent }) => {
                     <TableCell>Contestant</TableCell>
                     {categories.map((item) => (
                       <TableCell key={item.id} align="left">
-                        {item.category}
+                        {item.category}({item.percentage}%)
                       </TableCell>
                     ))}
                     <TableCell>Total</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {contestants.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell align="left">{item.name}</TableCell>
-                      {categories.map((items, index) => (
-                        <TableCell key={index} align="left">
-                          80 {index}
+                  {contestants.map((item) => {
+                    const totalScores = [];
+
+                    return (
+                      <TableRow key={item.id}>
+                        <TableCell align="left">{item.municipality}</TableCell>
+                        {categories.map((category) => {
+                          const contestantCategory =
+                            item.categories &&
+                            item.categories.find(
+                              (cat) => cat.category_id === category.id
+                            );
+                          const totalScore = contestantCategory
+                            ? contestantCategory.totalScore
+                            : null;
+
+                          if (contestantCategory && totalScore !== null) {
+                            const categoryPercentage = category.percentage || 0;
+                            const totalWeight = categoryPercentage / 100;
+                            const calculatedScore = totalScore * totalWeight;
+                            totalScores.push(calculatedScore);
+                            return (
+                              <TableCell key={category.id} align="left">
+                                {totalScore}
+                              </TableCell>
+                            );
+                          } else {
+                            return (
+                              <TableCell key={category.id} align="left">
+                                <span style={{ color: "red" }}>N/A</span>
+                              </TableCell>
+                            );
+                          }
+                        })}
+                        <TableCell>
+                          {totalScores.length > 0 ? (
+                            totalScores.reduce((a, b) => a + b).toFixed(2)
+                          ) : (
+                            <span style={{ color: "red" }}>N/A</span>
+                          )}
                         </TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </TableContainer>
+
             <DialogActions>
               <Button onClick={handlePrint} variant="contained">
                 Print

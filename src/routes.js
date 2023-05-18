@@ -8,6 +8,8 @@ import Dashboard from "./pages/dashboard/Dashboard";
 import DashboardLayout from "./pages/dashboard/DashboardLayout";
 import Event from "./pages/event/Event";
 import PageNotFound from "./pages/pageNotFound/PageNotFound";
+import Judge from "./pages/judge/Judge";
+import Contestant from "./pages/contestant/Contestant";
 
 const Router = () => {
   const RequireAuth = ({ children }) => {
@@ -21,12 +23,15 @@ const Router = () => {
           <Route index element={<Dashboard />} />
           <Route path="events" element={<Event />} />
           <Route path="accounts" element={<Account />} />
+          <Route path="contestants" element={<Contestant />} />
+          ``
           {/*
           <Route path="categories" element={<Category />} />
           <Route path="criterias" element={<Criteria />} />
-          <Route path="contestants" element={<Contestant />} />
           <Route path="scores" element={<Score />} /> */}
         </Route>
+
+        <Route path="judges" element={<Judge />} />
         <Route path="/" element={<Login />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>

@@ -18,11 +18,13 @@ import Swal from "sweetalert2";
 import { deleteUser, indexUsers, showUser } from "../../api/userController";
 import { useValue } from "../../context/ContextProvider";
 import actionHelper from "../../context/actionHelper";
+import { indexEvents } from "../../api/eventController";
 
 const Account = () => {
   const [userList, setUserList] = useState([{}]);
   const [title, setTitle] = useState("");
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [eventOption, setEventOption] = useState([]);
 
   const {
     state: { loading },
@@ -31,40 +33,52 @@ const Account = () => {
 
   const actions = actionHelper();
 
+  useEffect(() => {
+    fetchUsers();
+    fetchEventOption();
+  }, []);
+
   const fetchUsers = async () => {
     try {
       const users = await indexUsers();
-      console.log(users);
+
       setUserList(users);
     } catch (error) {
       console.error(error);
     }
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  const fetchEventOption = async () => {
+    const res = await indexEvents();
+    const filteredList = res.map((item, index) => {
+      return item.title;
+    });
+
+    filteredList.push(null);
+
+    setEventOption(filteredList);
+  };
 
   const handleEdit = async (e) => {
     try {
       const res = await showUser(e.original.id);
-      console.log(res);
+
       if (res.status === 200) {
+        dispatch({
+          type: actions.UPDATE_USER_ACCOUNT,
+          payload: {
+            id: res.data.user.id,
+            name: res.data.user.name,
+            email: res.data.user.email,
+            password: "",
+            contactNumber: res.data.user.contactNumber,
+            event: res.data.user.event,
+            status: res.data.user.status,
+            role: res.data.user.role,
+          },
+        });
         setTitle("Update Account");
         setCreateModalOpen(true);
-        // dispatch({
-        //   type: actions.UPDATE_USER_ACCOUNT,
-        //   payload: {
-        //     id: res.data.user.id,
-        //     name: res.data.user.name,
-        //     email: res.data.user.email,
-        //     password: res.data.user.password,
-        //     contactNumber: res.data.user.contactNumber,
-        //     event: res.data.user.event,
-        //     status: res.data.user.status,
-        //     role: res.data.user.role,
-        //   },
-        // });
       }
     } catch (error) {
       console.log(error);
@@ -121,7 +135,7 @@ const Account = () => {
         header: "Email",
       },
       {
-        accessorKey: "contactNo",
+        accessorKey: "contactNumber",
         header: "Contact Number",
       },
       {
@@ -201,6 +215,7 @@ const Account = () => {
                 onClose={handleClose}
                 title={title}
                 fetchUsers={() => fetchUsers()}
+                eventOption={eventOption}
               />
             </>
           )}

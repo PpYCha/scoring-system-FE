@@ -22,20 +22,25 @@ import Swal from "sweetalert2";
 import SelectComponent from "../../components/SelectComponent";
 import actionHelper from "../../context/actionHelper";
 
-const AddEditUserModal = ({ open, onClose, onSubmit, title, fetchUsers }) => {
+const AddEditUserModal = ({
+  open,
+  onClose,
+  onSubmit,
+  title,
+  fetchUsers,
+  eventOption,
+}) => {
+  const [event, setEvent] = useState([]);
+
   const {
     state: { userAccount },
     dispatch,
   } = useValue();
   const actions = actionHelper();
 
-  useEffect(() => {
-    // dispatch({ type: actions.RESET_USER_ACCOUNT });
-    console.log(userAccount);
-  }, [open]);
+  useEffect(() => {}, [open]);
 
   const handleSubmit = async (values, { setFieldError }) => {
-    console.log(values);
     try {
       let res;
       if (userAccount.id) {
@@ -43,7 +48,7 @@ const AddEditUserModal = ({ open, onClose, onSubmit, title, fetchUsers }) => {
       } else {
         res = await storeUser(values);
       }
-      console.log(res);
+
       Swal.fire({
         icon: "success",
         title: res.data.message,
@@ -67,14 +72,23 @@ const AddEditUserModal = ({ open, onClose, onSubmit, title, fetchUsers }) => {
     }
   };
 
-  const validationSchema = Yup.object({
+  const validationSchemaCreate = Yup.object({
     name: Yup.string().required("Please enter name"),
     email: Yup.string().required("Please enter email").email("Invalid email"),
     password: Yup.string()
       .required("Please enter password")
       .min(4, "Password should be minimum 4 characters long"),
+    status: Yup.string().required("Please select status"),
+    role: Yup.string().required("Please select role"),
+  });
 
-    phoneNumber: Yup.number(),
+  const validationSchemaUpdate = Yup.object({
+    name: Yup.string().required("Please enter name"),
+    email: Yup.string().required("Please enter email").email("Invalid email"),
+    password: Yup.string().min(
+      4,
+      "Password should be minimum 4 characters long"
+    ),
     status: Yup.string().required("Please select status"),
     role: Yup.string().required("Please select role"),
   });
@@ -108,7 +122,11 @@ const AddEditUserModal = ({ open, onClose, onSubmit, title, fetchUsers }) => {
           initialValues={{
             ...userAccount,
           }}
-          validationSchema={validationSchema}
+          validationSchema={
+            title === "Create Account"
+              ? validationSchemaCreate
+              : validationSchemaUpdate
+          }
           onSubmit={handleSubmit}
         >
           <Form>
@@ -137,7 +155,11 @@ const AddEditUserModal = ({ open, onClose, onSubmit, title, fetchUsers }) => {
                   />
                 </Grid>
                 <Grid item md={4}>
-                  <SelectComponent name="event" label="Event" options={event} />
+                  <SelectComponent
+                    name="event"
+                    label="Event"
+                    options={eventOption}
+                  />
                 </Grid>
               </Grid>
             </Box>
@@ -161,4 +183,4 @@ export default AddEditUserModal;
 
 const status = ["Active", "InActive"];
 const role = ["Admin", "Tabulator", "Judge"];
-const event = ["Miss Universe", "Mutya san Ibabao"];
+// const event = ["Miss Universe", "Mutya san Ibabao"];

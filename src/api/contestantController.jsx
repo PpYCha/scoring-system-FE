@@ -31,6 +31,7 @@ export const storeContestant = async (value) => {
       dateOfBirth: value.dateOfBirth,
       birthPlace: value.birthPlace,
       event_id: value.event_id,
+      cotestant_number: value.cotestant_number,
     });
 
     return res;

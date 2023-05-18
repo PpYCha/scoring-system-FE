@@ -34,8 +34,10 @@ import AddEditCategory from "../AddEditCategory";
 import { useValue } from "../../context/ContextProvider";
 import actionHelper from "../../context/actionHelper";
 import Swal from "sweetalert2";
-import AddEditContestant from "../AddEditContestant";
+import AddEditContestant from "../contestant/AddEditContestant";
 import AddEditScore from "../score/AddEditScore";
+import { navigateAccounts, navigateContestants } from "../../utils/navigateUrl";
+import { useNavigate } from "react-router-dom";
 
 const Event = () => {
   const [tableList, setTableList] = useState([{}]);
@@ -48,6 +50,7 @@ const Event = () => {
   const { dispatch } = useValue();
 
   const actions = actionHelper();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch();
@@ -224,7 +227,8 @@ const Event = () => {
                     <IconButton
                       color="success"
                       onClick={(e) => {
-                        handleContestant(row);
+                        // handleContestant(row);
+                        navigate(navigateContestants);
                       }}
                     >
                       <WorkspacePremium />

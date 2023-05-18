@@ -132,10 +132,6 @@ const SideList = ({ open, setOpen }) => {
                 }}
                 component={Link}
                 to={item.link}
-                selected={
-                  item.location === selectedLink.pathname ||
-                  item.location2 === selectedLink.pathname
-                }
               >
                 <ListItemIcon
                   sx={{

@@ -6,6 +6,7 @@ import {
   DialogTitle,
   Grid,
   IconButton,
+  Stack,
   Tooltip,
 } from "@mui/material";
 import { Form, Formik } from "formik";
@@ -26,17 +27,19 @@ import {
   showCategory,
   storeCategory,
 } from "../api/categoryController";
-import { CropDin, Delete } from "@mui/icons-material";
+import { CropDin, Delete, Edit } from "@mui/icons-material";
 import { deleteCriteria, showCriteria } from "../api/criteriaController";
 
 import AddEditCriteria from "./AddEditCriteria";
 import { useValue } from "../context/ContextProvider";
 import actionHelper from "../context/actionHelper";
+import { type } from "@testing-library/user-event/dist/type";
 
 const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
   const [startDate, setStartDate] = useState(dayjs());
   const [tableList, setTableList] = useState([{}]);
   const [openCriteria, setOpenCriteria] = useState(false);
+  const [totalPercentage, setTotalPercentage] = useState(0);
 
   const {
     state: { category },
@@ -78,25 +81,20 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
         title: "Oops...",
         text: JSON.stringify(error.errors),
       });
+      console.log(error);
     }
   };
 
-  const handleCriteria = async (e) => {
-    try {
-      const res = await showCategory(e.original.id);
-
-      if (res.status === 200) {
-        dispatch({
-          type: actions.UPDATE_CRITERIA,
-          payload: {
-            category_id: res.data.category.id,
-          },
-        });
-        setOpenCriteria(true);
-      }
-    } catch (error) {
-      console.log(error);
-    }
+  const handleEdit = (row) => {
+    dispatch({
+      type: actions.UPDATE_CATEGORY,
+      payload: {
+        category_id: row.original.id,
+        category: row.original.category,
+        description: row.original.description,
+        percentage: row.original.percentage,
+      },
+    });
   };
 
   const handleDelete = async (e) => {
@@ -118,6 +116,24 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
           fetch();
         }
       });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleCriteria = async (e) => {
+    try {
+      const res = await showCategory(e.original.id);
+
+      if (res.status === 200) {
+        dispatch({
+          type: actions.UPDATE_CRITERIA,
+          payload: {
+            category_id: res.data.category.id,
+          },
+        });
+        setOpenCriteria(true);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -145,8 +161,13 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
     },
   ];
 
-  const columns = useMemo(
-    () => [
+  const columns = useMemo(() => {
+    const totalPercentage = tableList.reduce(
+      (acc, curr) => acc + parseInt(curr.percentage),
+      0
+    );
+
+    return [
       {
         accessorKey: "id",
         header: "ID",
@@ -173,16 +194,25 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
       {
         accessorKey: "percentage",
         header: "Percentage",
+        Footer: () => (
+          <Stack>
+            Total:
+            <Box
+              color={totalPercentage === 100 ? "success.main" : "warning.main"}
+            >
+              {totalPercentage}%
+            </Box>
+          </Stack>
+        ),
       },
-    ],
-    []
-  );
+    ];
+  }, [tableList]);
 
   const cVisibility = { id: false };
 
   const validationSchema = Yup.object({
     category: Yup.string().required("Please enter event category"),
-    description: Yup.string().required("Please enter description"),
+    // description: Yup.string().required("Please enter description"),
     percentage: Yup.number().required("Please enter percentage"),
   });
 
@@ -227,6 +257,11 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
                             onClick={(e) => handleCriteria(row)}
                           >
                             <CropDin />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip arrow placement="right" title="Edit">
+                          <IconButton onClick={(e) => handleEdit(row)}>
+                            <Edit />
                           </IconButton>
                         </Tooltip>
                         <Tooltip arrow placement="right" title="Delete">

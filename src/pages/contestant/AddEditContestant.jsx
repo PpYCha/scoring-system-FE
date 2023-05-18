@@ -1,7 +1,9 @@
 import {
+  AppBar,
   Avatar,
   Box,
   Button,
+  Card,
   Dialog,
   DialogActions,
   DialogContent,
@@ -10,26 +12,32 @@ import {
   IconButton,
   Input,
   Stack,
+  Toolbar,
   Tooltip,
+  Typography,
 } from "@mui/material";
-import { Form, Formik } from "formik";
+import { useFormikContext, Form, Formik } from "formik";
 import React, { useEffect, useMemo, useState } from "react";
-import ButtonCancel from "../components/Button/ButtonCancel";
-import ButtonSave from "../components/Button/ButtonSave";
+import ButtonCancel from "../../components/Button/ButtonCancel";
+import ButtonSave from "../../components/Button/ButtonSave";
 import * as Yup from "yup";
 
 import dayjs from "dayjs";
-import TextfieldComponent from "../components/TextFieldComponent";
+import TextfieldComponent from "../../components/TextFieldComponent";
 import { DesktopDatePicker } from "@mui/x-date-pickers";
-import { storeEvent } from "../api/eventController";
+import { storeEvent } from "../../api/eventController";
 import Swal from "sweetalert2";
-import { formatDatePicker } from "../utils/formatter";
+import { formatDatePicker } from "../../utils/formatter";
 
-import { indexContestants, storeContestant } from "../api/contestantController";
+import {
+  indexContestants,
+  storeContestant,
+} from "../../api/contestantController";
 import MaterialReactTable from "material-react-table";
-import { CropDin, Delete, Edit } from "@mui/icons-material";
-import { useValue } from "../context/ContextProvider";
-import actionHelper from "../context/actionHelper";
+import { Close, CropDin, Delete, Edit } from "@mui/icons-material";
+import { useValue } from "../../context/ContextProvider";
+import actionHelper from "../../context/actionHelper";
+import Slide from "@mui/material/Slide";
 
 const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
   const [startDate, setStartDate] = useState(dayjs());
@@ -79,7 +87,9 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
     }
   };
 
-  const handleEdit = async () => {};
+  const handleEdit = async (e) => {
+    console.log(e.original.id);
+  };
   const handleDelete = async () => {};
 
   const handleImageChange = (e) => {
@@ -95,14 +105,19 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
 
   const textInput = [
     {
+      name: "cotestant_number",
+      label: "Contestant Number",
+      md: 4,
+    },
+    {
       name: "name",
       label: "Name",
-      md: 6,
+      md: 4,
     },
     {
       name: "municipality",
       label: "Municipality",
-      md: 6,
+      md: 4,
     },
     {
       name: "weight",
@@ -162,6 +177,10 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
       {
         accessorKey: "id",
         header: "ID",
+      },
+      {
+        accessorKey: "cotestant_number",
+        header: "Number",
       },
       {
         accessorKey: "name",
@@ -232,7 +251,7 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
   });
 
   return (
-    <Dialog open={openEvent} fullWidth={true} maxWidth="xl">
+    <Dialog open={openEvent} fullScreen TransitionComponent={Transition}>
       <DialogContent>
         <Formik
           initialValues={{ ...contestant }}
@@ -240,55 +259,80 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
           onSubmit={handleSubmit}
         >
           <Form>
-            <Grid container spacing={1} justifyContent="center" p={1}>
-              <Stack
-                direction="row"
-                justifyContent="space-evenly"
-                alignItems="flex-start"
-                spacing={0}
-              >
-                <Grid item container md={4}>
-                  <Grid item md={6}>
-                    <label htmlFor="profilePhoto">
-                      <input
-                        accept="image/*"
-                        id="profilePhoto"
-                        type="file"
-                        style={{ display: "none" }}
-                        onChange={handleImageChange}
-                      />
-                      <Avatar
-                        src={"../../.assets/noImage.png"}
-                        sx={{ width: 250, height: 250, cursor: "pointer" }}
-                      />
-                    </label>
-                  </Grid>
-                </Grid>
-                <Grid item container md={8} spacing={1}>
-                  {textInput.map((item) => {
-                    return (
-                      <Grid item md={item.md ? item.md : 4} key={item.name}>
-                        <TextfieldComponent
-                          name={item.name}
-                          label={item.label}
-                        />
-                      </Grid>
-                    );
-                  })}
+            <AppBar sx={{ position: "relative", marginBottom: 2 }}>
+              <Toolbar>
+                <IconButton
+                  edge="start"
+                  color="inherit"
+                  onClick={handleCloseEvent}
+                  aria-label="close"
+                >
+                  <Close />
+                </IconButton>
 
-                  <Grid item md={3}>
-                    <DesktopDatePicker
-                      name="apDate"
-                      label="Date of Birth"
-                      inputFormat="DD/MM/YYYY"
-                      value={startDate}
-                      onChange={(newValue) => setStartDate(newValue)}
-                      slotProps={{ textField: { size: "small" } }}
-                      sx={{ width: "100%" }}
-                    />
+                <Typography
+                  sx={{ ml: 2, flex: 1 }}
+                  variant="h6"
+                  component="div"
+                >
+                  Contestant Information
+                </Typography>
+                <ButtonSave />
+              </Toolbar>
+            </AppBar>
+
+            <Grid container spacing={1} justifyContent="center" p={1}>
+              <Card>
+                <Stack
+                  direction="row"
+                  justifyContent="space-evenly"
+                  alignItems="flex-start"
+                  spacing={0}
+                  p={2}
+                >
+                  <Grid item container md={4}>
+                    <Grid item md={6}>
+                      <label htmlFor="profilePhoto">
+                        <input
+                          accept="image/*"
+                          id="profilePhoto"
+                          type="file"
+                          style={{ display: "none" }}
+                          onChange={handleImageChange}
+                        />
+                        <Avatar
+                          src={"../../.assets/noImage.png"}
+                          sx={{ width: 250, height: 250, cursor: "pointer" }}
+                        />
+                      </label>
+                    </Grid>
                   </Grid>
-                </Grid>
-              </Stack>
+                  <Grid item container md={8} spacing={1}>
+                    {textInput.map((item) => {
+                      return (
+                        <Grid item md={item.md ? item.md : 4} key={item.name}>
+                          <TextfieldComponent
+                            name={item.name}
+                            label={item.label}
+                          />
+                        </Grid>
+                      );
+                    })}
+
+                    <Grid item md={3}>
+                      <DesktopDatePicker
+                        name="apDate"
+                        label="Date of Birth"
+                        inputFormat="DD/MM/YYYY"
+                        value={startDate}
+                        onChange={(newValue) => setStartDate(newValue)}
+                        slotProps={{ textField: { size: "small" } }}
+                        sx={{ width: "100%" }}
+                      />
+                    </Grid>
+                  </Grid>
+                </Stack>
+              </Card>
               <Grid item md={12}>
                 <MaterialReactTable
                   columns={columns}
@@ -299,8 +343,8 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
                   initialState={{
                     density: "compact",
                     columnVisibility: { id: false },
+                    pagination: { pageSize: 30 },
                   }}
-                  pageSize={30}
                   enableDensityToggle={false}
                   enableFullScreenToggle={false}
                   enableHiding={false}
@@ -327,16 +371,15 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
                 />
               </Grid>
             </Grid>
-
-            <DialogActions>
-              <ButtonSave />
-              <ButtonCancel handleClose={handleCloseEvent} />
-            </DialogActions>
           </Form>
         </Formik>
       </DialogContent>
     </Dialog>
   );
 };
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 export default AddEditContestant;

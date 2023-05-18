@@ -34,25 +34,6 @@ const AppBar = styled(MuiAppBar, {
 
 const DashboardLayout = () => {
   const [open, setOpen] = useState(false);
-  const [dark, setDark] = useState(false);
-
-  const darkTheme = useMemo(
-    () =>
-      createTheme({
-        palette: {
-          mode: dark ? "dark" : "light",
-          type: "light",
-
-          primary: {
-            main: "#388e3c",
-          },
-          typography: {
-            fontFamily: "Roboto Slab",
-          },
-        },
-      }),
-    [dark]
-  );
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -62,7 +43,6 @@ const DashboardLayout = () => {
     <Box
       sx={{
         display: "flex",
-        background: "#ececec",
         width: "100%",
         height: "100vh",
       }}

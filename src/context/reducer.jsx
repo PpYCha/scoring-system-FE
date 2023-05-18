@@ -121,6 +121,7 @@ const reducer = (state, action) => {
             dateOfBirth: "",
             birthPlace: "",
             event_id: "",
+            cotestant_number: "",
           },
         };
 

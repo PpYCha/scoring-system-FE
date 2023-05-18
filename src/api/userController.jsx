@@ -14,6 +14,7 @@ export const indexUsers = async () => {
 
 // Store a newly created user in storage.
 export const storeUser = async (value) => {
+  console.log(value);
   try {
     const res = await axios.post(`${apiUrl}users`, {
       name: value.name,
@@ -50,6 +51,7 @@ export const showUser = async (id) => {
 
 //Update the specified user in storage.
 export const updateUser = async (id, value) => {
+  console.log(value);
   try {
     const res = await axios.put(`${apiUrl}users/${id}`, {
       name: value.name,
@@ -60,7 +62,7 @@ export const updateUser = async (id, value) => {
       event: value.event,
       role: value.role,
     });
-    console.log("Diasan:", res);
+
     return res;
   } catch (error) {
     console.log("post error:", error);
