@@ -38,6 +38,13 @@ import AddEditContestant from "../contestant/AddEditContestant";
 import AddEditScore from "../score/AddEditScore";
 import { navigateAccounts, navigateContestants } from "../../utils/navigateUrl";
 import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faChessQueen,
+  faEnvelope,
+  faLayerGroup,
+  faSquarePollHorizontal,
+} from "@fortawesome/free-solid-svg-icons";
 
 const Event = () => {
   const [tableList, setTableList] = useState([{}]);
@@ -92,7 +99,7 @@ const Event = () => {
             event_id: res.data.event.id,
           },
         });
-        setOpenContestants(true);
+        navigate(navigateContestants);
       }
     } catch (error) {
       console.log(error);
@@ -219,19 +226,18 @@ const Event = () => {
                       color="primary"
                       onClick={(e) => handleCategory(row)}
                     >
-                      <Workspaces />
+                      <FontAwesomeIcon icon={faLayerGroup} />
                     </IconButton>
                   </Tooltip>
 
                   <Tooltip arrow placement="right" title="Contestants">
                     <IconButton
-                      color="success"
+                      // color="success"
                       onClick={(e) => {
-                        // handleContestant(row);
-                        navigate(navigateContestants);
+                        handleContestant(row);
                       }}
                     >
-                      <WorkspacePremium />
+                      <FontAwesomeIcon icon={faChessQueen} />
                     </IconButton>
                   </Tooltip>
                   <Tooltip arrow placement="right" title="Score">
@@ -241,7 +247,7 @@ const Event = () => {
                         handleScore(row);
                       }}
                     >
-                      <Calculate />
+                      <FontAwesomeIcon icon={faSquarePollHorizontal} />
                     </IconButton>
                   </Tooltip>
                   <Tooltip arrow placement="right" title="Delete">

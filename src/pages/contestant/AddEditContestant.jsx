@@ -52,17 +52,9 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
   const actions = actionHelper();
 
   useEffect(() => {
-    fetch();
-  }, [openEvent]);
-
-  const fetch = async () => {
-    const res = await indexContestants();
-    const filteredList = res.filter(
-      (item) => item.event_id === contestant.event_id
-    );
-
-    setTableList(filteredList);
-  };
+   
+  }, [])
+  
 
   const handleSubmit = async (values) => {
     try {
@@ -172,69 +164,6 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
     },
   ];
 
-  const columns = useMemo(
-    () => [
-      {
-        accessorKey: "id",
-        header: "ID",
-      },
-      {
-        accessorKey: "cotestant_number",
-        header: "Number",
-      },
-      {
-        accessorKey: "name",
-        header: "Name",
-      },
-      {
-        accessorKey: "municipality",
-        header: "Municipality",
-      },
-      {
-        accessorKey: "weight",
-        header: "Weight",
-      },
-      {
-        accessorKey: "height",
-        header: "Height",
-      },
-      {
-        accessorKey: "shoeSize",
-        header: "Shoe Size",
-      },
-      {
-        accessorKey: "swimsuitSize",
-        header: "Swimsuit Size",
-      },
-      {
-        accessorKey: "bust",
-        header: "Bust",
-      },
-      {
-        accessorKey: "waist",
-        header: "Waist",
-      },
-      {
-        accessorKey: "hips",
-        header: "Hips",
-      },
-      {
-        accessorKey: "nickname",
-        header: "Nickname",
-      },
-
-      {
-        accessorKey: "birthPlace",
-        header: "Birth Place",
-      },
-      {
-        accessorKey: "age",
-        header: "Age",
-      },
-    ],
-    []
-  );
-
   const validationSchema = Yup.object({
     name: Yup.string().required("Please enter name"),
     municipality: Yup.string().required("Please enter municipality"),
@@ -251,7 +180,12 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
   });
 
   return (
-    <Dialog open={openEvent} fullScreen TransitionComponent={Transition}>
+    <Dialog
+      open={openEvent}
+      fullWidth={true}
+      maxWidth="xl"
+      TransitionComponent={Transition}
+    >
       <DialogContent>
         <Formik
           initialValues={{ ...contestant }}
@@ -259,28 +193,6 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
           onSubmit={handleSubmit}
         >
           <Form>
-            <AppBar sx={{ position: "relative", marginBottom: 2 }}>
-              <Toolbar>
-                <IconButton
-                  edge="start"
-                  color="inherit"
-                  onClick={handleCloseEvent}
-                  aria-label="close"
-                >
-                  <Close />
-                </IconButton>
-
-                <Typography
-                  sx={{ ml: 2, flex: 1 }}
-                  variant="h6"
-                  component="div"
-                >
-                  Contestant Information
-                </Typography>
-                <ButtonSave />
-              </Toolbar>
-            </AppBar>
-
             <Grid container spacing={1} justifyContent="center" p={1}>
               <Card>
                 <Stack
@@ -333,44 +245,11 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
                   </Grid>
                 </Stack>
               </Card>
-              <Grid item md={12}>
-                <MaterialReactTable
-                  columns={columns}
-                  data={tableList}
-                  enableColumnActions={false}
-                  enableSorting={false}
-                  enableEditing
-                  initialState={{
-                    density: "compact",
-                    columnVisibility: { id: false },
-                    pagination: { pageSize: 30 },
-                  }}
-                  enableDensityToggle={false}
-                  enableFullScreenToggle={false}
-                  enableHiding={false}
-                  renderRowActions={({ row, table }) => (
-                    <Box sx={{ display: "flex", gap: "1rem" }}>
-                      <Tooltip arrow placement="left" title="Criteria">
-                        <IconButton
-                          color="secondary"
-                          onClick={(e) => handleEdit(row)}
-                        >
-                          <Edit />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip arrow placement="right" title="Delete">
-                        <IconButton
-                          color="error"
-                          onClick={(e) => handleDelete(row)}
-                        >
-                          <Delete />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  )}
-                />
-              </Grid>
             </Grid>
+            <DialogActions>
+              <ButtonSave />
+              <ButtonCancel handleClose={handleCloseEvent} />
+            </DialogActions>
           </Form>
         </Formik>
       </DialogContent>

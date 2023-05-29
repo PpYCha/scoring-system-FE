@@ -34,6 +34,11 @@ import AddEditCriteria from "./AddEditCriteria";
 import { useValue } from "../context/ContextProvider";
 import actionHelper from "../context/actionHelper";
 import { type } from "@testing-library/user-event/dist/type";
+import {
+  faPenToSquare,
+  faScaleUnbalancedFlip,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
   const [startDate, setStartDate] = useState(dayjs());
@@ -256,12 +261,12 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
                             color="secondary"
                             onClick={(e) => handleCriteria(row)}
                           >
-                            <CropDin />
+                            <FontAwesomeIcon icon={faScaleUnbalancedFlip} />
                           </IconButton>
                         </Tooltip>
                         <Tooltip arrow placement="right" title="Edit">
                           <IconButton onClick={(e) => handleEdit(row)}>
-                            <Edit />
+                            <FontAwesomeIcon icon={faPenToSquare} />
                           </IconButton>
                         </Tooltip>
                         <Tooltip arrow placement="right" title="Delete">
