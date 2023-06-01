@@ -52,6 +52,20 @@ const reducer = (state, action) => {
             date: "",
           },
         };
+      case actions.UPDATE_SUBEVENT:
+        return {
+          ...state,
+          subEvent: { ...state.subEvent, ...action.payload },
+        };
+
+      case actions.RESET_SUBEVENT:
+        return {
+          ...state,
+          subEvent: {
+            title: "",
+            date: "",
+          },
+        };
       case actions.UPDATE_CATEGORY:
         return {
           ...state,

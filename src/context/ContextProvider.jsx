@@ -19,6 +19,10 @@ const initialState = {
     description: "",
     date: "",
   },
+  subEvent: {
+    title: "",
+    date: "",
+  },
   category: {
     category: "",
     description: "",

@@ -45,12 +45,15 @@ import {
   faLayerGroup,
   faSquarePollHorizontal,
 } from "@fortawesome/free-solid-svg-icons";
+import AddEditSubEventDialog from "./AddEditSubEventDialog";
+import { indexSubEvents } from "../../api/subEventController";
 
 const Event = () => {
   const [tableList, setTableList] = useState([{}]);
+  const [subList, setSubList] = useState([{}]);
   const [openEvent, setOpenEvent] = useState(false);
+  const [openSubEvent, setOpenSubEvent] = useState(false);
   const [openCategory, setOpenCategory] = useState(false);
-
   const [openContestants, setOpenContestants] = useState(false);
   const [openScore, setOpenScore] = useState(false);
 
@@ -64,8 +67,14 @@ const Event = () => {
   }, []);
 
   const fetch = async () => {
-    const res = await indexEvents();
-    setTableList(res);
+    const [resEvents, resSubEvents] = await Promise.all([
+      indexEvents(),
+      indexSubEvents(),
+    ]);
+
+    setTableList(resEvents);
+    setSubList(resSubEvents);
+    console.log(resSubEvents);
   };
 
   const handleStore = async (values) => {};
@@ -82,6 +91,23 @@ const Event = () => {
           },
         });
         setOpenCategory(true);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const handleSubEvent = async (e) => {
+    try {
+      const res = await showEvent(e.original.id);
+
+      if (res.status === 200) {
+        dispatch({
+          type: actions.UPDATE_SUBEVENT,
+          payload: {
+            event_id: res.data.event.id,
+          },
+        });
+        setOpenSubEvent(true);
       }
     } catch (error) {
       console.log(error);
@@ -153,6 +179,7 @@ const Event = () => {
     setOpenCategory(false);
     setOpenContestants(false);
     setOpenScore(false);
+    setOpenSubEvent(false);
     fetch();
   };
 
@@ -221,41 +248,12 @@ const Event = () => {
               }}
               renderRowActions={({ row, table }) => (
                 <Box sx={{ display: "flex", gap: "1rem" }}>
-                  <Tooltip arrow placement="left" title="Category">
+                  <Tooltip arrow placement="left" title="Sub Event">
                     <IconButton
                       color="primary"
-                      onClick={(e) => handleCategory(row)}
+                      onClick={(e) => handleSubEvent(row)}
                     >
                       <FontAwesomeIcon icon={faLayerGroup} />
-                    </IconButton>
-                  </Tooltip>
-
-                  <Tooltip arrow placement="right" title="Contestants">
-                    <IconButton
-                      // color="success"
-                      onClick={(e) => {
-                        handleContestant(row);
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faChessQueen} />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip arrow placement="right" title="Score">
-                    <IconButton
-                      color="warning"
-                      onClick={(e) => {
-                        handleScore(row);
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faSquarePollHorizontal} />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip arrow placement="right" title="Delete">
-                    <IconButton
-                      color="error"
-                      onClick={(e) => handleDelete(row)}
-                    >
-                      <Delete />
                     </IconButton>
                   </Tooltip>
                 </Box>
@@ -268,6 +266,55 @@ const Event = () => {
                 >
                   Create New Event
                 </Button>
+              )}
+              renderDetailPanel={({ row }) => (
+                <>
+                  {subList
+                    .filter((item) => item.event_id === row.original.id) // Filter the subList based on the account in tableList row
+                    .map((item) => (
+                      <Box sx={{ display: "flex", gap: "1rem" }} key={item.id}>
+                        <Tooltip arrow placement="left" title="Category">
+                          <IconButton
+                            color="primary"
+                            onClick={(e) => handleCategory(row)}
+                          >
+                            <FontAwesomeIcon icon={faLayerGroup} />
+                          </IconButton>
+                        </Tooltip>
+
+                        <Tooltip arrow placement="right" title="Contestants">
+                          <IconButton
+                            // color="success"
+                            onClick={(e) => {
+                              handleContestant(row);
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faChessQueen} />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip arrow placement="right" title="Score">
+                          <IconButton
+                            color="warning"
+                            onClick={(e) => {
+                              handleScore(row);
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faSquarePollHorizontal} />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip arrow placement="right" title="Delete">
+                          <IconButton
+                            color="error"
+                            onClick={(e) => handleDelete(row)}
+                          >
+                            <Delete />
+                          </IconButton>
+                        </Tooltip>
+
+                        <Typography>{item.title}</Typography>
+                      </Box>
+                    ))}
+                </>
               )}
             />
           </Box>
@@ -285,6 +332,10 @@ const Event = () => {
           handleCloseEvent={handleClose}
         />
         <AddEditScore openEvent={openScore} handleCloseEvent={handleClose} />
+        <AddEditSubEventDialog
+          openEvent={openSubEvent}
+          handleCloseEvent={handleClose}
+        />
       </Box>
     </LocalizationProvider>
   );
