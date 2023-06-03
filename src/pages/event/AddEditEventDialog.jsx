@@ -14,10 +14,11 @@ import * as Yup from "yup";
 import dayjs from "dayjs";
 import TextfieldComponent from "../../components/TextFieldComponent";
 import { DesktopDatePicker } from "@mui/x-date-pickers";
-import { storeEvent } from "../../api/eventController";
+import { storeEvent, updateEvent } from "../../api/eventController";
 import Swal from "sweetalert2";
 import { formatDatePicker } from "../../utils/formatter";
 import { useValue } from "../../context/ContextProvider";
+import actionHelper from "../../context/actionHelper";
 
 const AddEditEventDialog = ({ openEvent, handleCloseEvent }) => {
   const [startDate, setStartDate] = useState(dayjs());
@@ -27,13 +28,27 @@ const AddEditEventDialog = ({ openEvent, handleCloseEvent }) => {
     dispatch,
   } = useValue();
 
+  const action = actionHelper();
+
   const handleSubmit = async (values) => {
+    handleSave(values);
+  };
+
+  const handleSave = async (values) => {
+    dispatch({ type: action.START_LOADING });
     try {
+      let res;
       const dateFormatted = formatDatePicker(startDate.$d);
       let inputs = values;
       inputs.date = dateFormatted;
 
-      const res = await storeEvent(inputs);
+      if (typeof values.id === "undefined") {
+        res = await storeEvent(inputs);
+      }
+      if (values.id) {
+        res = await updateEvent(values);
+      }
+
       Swal.fire({
         icon: "success",
         title: res.data.message,
@@ -48,28 +63,29 @@ const AddEditEventDialog = ({ openEvent, handleCloseEvent }) => {
         text: JSON.stringify(error.errors),
       });
     }
+    dispatch({ type: action.END_LOADING });
   };
 
   const textInput = [
     {
       name: "title",
       label: "Title",
-      md: 12,
+      md: 8,
     },
-    {
-      name: "description",
-      label: "Description",
-      md: 12,
-    },
+    // {
+    //   name: "description",
+    //   label: "Description",
+    //   md: 12,
+    // },
   ];
 
   const validationSchema = Yup.object({
     title: Yup.string().required("Please enter event title"),
-    description: Yup.string().required("Please enter description"),
   });
 
   return (
     <Dialog open={openEvent} fullWidth={true} maxWidth="lg">
+      <DialogTitle>Event Details</DialogTitle>
       <DialogContent>
         <Formik
           initialValues={{ ...event }}
@@ -89,7 +105,7 @@ const AddEditEventDialog = ({ openEvent, handleCloseEvent }) => {
               <Grid item md={4}>
                 <DesktopDatePicker
                   name="apDate"
-                  label="Date"
+                  label="Date of Event"
                   inputFormat="DD/MM/YYYY"
                   value={startDate}
                   onChange={(newValue) => setStartDate(newValue)}

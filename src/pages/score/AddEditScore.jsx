@@ -107,7 +107,7 @@ const AddEditScore = ({ openEvent, handleCloseEvent }) => {
       {loading ? null : (
         <Dialog open={openEvent} fullWidth={true} maxWidth="lg">
           <DialogContent>
-            <TableContainer component={Paper} ref={tableRef}>
+            {/* <TableContainer component={Paper} ref={tableRef}>
               <Table
                 sx={{ minWidth: 700, fontSize: "0.8rem", padding: "8px" }}
                 aria-label="spanning table"
@@ -117,7 +117,7 @@ const AddEditScore = ({ openEvent, handleCloseEvent }) => {
                   <TableRow>
                     <TableCell>Contestant</TableCell>
                     {categories.map((item) => (
-                      <TableCell key={item.id} align="left">
+                      <TableCell key={item.category} align="left">
                         {item.category}({item.percentage}%)
                       </TableCell>
                     ))}
@@ -171,7 +171,7 @@ const AddEditScore = ({ openEvent, handleCloseEvent }) => {
                   })}
                 </TableBody>
               </Table>
-            </TableContainer>
+            </TableContainer> */}
 
             <DialogActions>
               <Button onClick={handlePrint} variant="contained">

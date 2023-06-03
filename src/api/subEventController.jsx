@@ -2,7 +2,7 @@ import axios from "axios";
 
 const apiUrl = process.env.REACT_APP_API;
 
-// Display a listing of the users
+// Display a listing of the datas
 export const indexSubEvents = async () => {
   try {
     const res = await axios.get(`${apiUrl}subevents`);
@@ -13,7 +13,7 @@ export const indexSubEvents = async () => {
   }
 };
 
-// Store a newly created user in storage.
+// Store a newly created data in storage.
 export const storeSubEvent = async (value) => {
   console.log(value);
   try {
@@ -47,9 +47,21 @@ export const showSubEvent = async (id) => {
   }
 };
 
-//Update the specified user in storage.
+//Update the specified data in storage.
+export const updateSubEvent = async (value) => {
+  try {
+    const res = await axios.put(`${apiUrl}subevents/${value.id}`, {
+      title: value.title,
+      date: value.date,
+      event_id: value.event_id,
+    });
+    return res;
+  } catch (error) {
+    console.log("post error:", error);
+  }
+};
 
-//Remove the specified user from storage
+//Remove the specified data from storage
 export const deleteSubEvent = async (id) => {
   try {
     const res = await axios.delete(`${apiUrl}subevents/${id}`);

@@ -2,30 +2,16 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
+  FormControlLabel,
   IconButton,
   Paper,
   Stack,
+  Switch,
   Tooltip,
   Typography,
 } from "@mui/material";
 import MaterialReactTable from "material-react-table";
-import {
-  Add,
-  Calculate,
-  Category,
-  CreditScore,
-  CropDin,
-  CropTwoTone,
-  Delete,
-  Edit,
-  KingBed,
-  People,
-  Score,
-  Scoreboard,
-  SportsScore,
-  WorkspacePremium,
-  Workspaces,
-} from "@mui/icons-material";
+import { Add, Delete } from "@mui/icons-material";
 import AddEditEventDialog from "./AddEditEventDialog";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -36,17 +22,23 @@ import actionHelper from "../../context/actionHelper";
 import Swal from "sweetalert2";
 import AddEditContestant from "../contestant/AddEditContestant";
 import AddEditScore from "../score/AddEditScore";
-import { navigateAccounts, navigateContestants } from "../../utils/navigateUrl";
+import { navigateContestants } from "../../utils/navigateUrl";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChessQueen,
-  faEnvelope,
   faLayerGroup,
+  faPenToSquare,
   faSquarePollHorizontal,
+  faTrashCan,
+  faCirclePlus,
+  faCalendarPlus,
+  faSquarePollVertical,
+  faGear,
 } from "@fortawesome/free-solid-svg-icons";
 import AddEditSubEventDialog from "./AddEditSubEventDialog";
-import { indexSubEvents } from "../../api/subEventController";
+import { deleteSubEvent, indexSubEvents } from "../../api/subEventController";
+import AddEditSettingsEventDialog from "./AddEditSettingsEventDialog";
 
 const Event = () => {
   const [tableList, setTableList] = useState([{}]);
@@ -56,6 +48,7 @@ const Event = () => {
   const [openCategory, setOpenCategory] = useState(false);
   const [openContestants, setOpenContestants] = useState(false);
   const [openScore, setOpenScore] = useState(false);
+  const [openSettingsEvent, setOpenSettingsEvent] = useState(false);
 
   const { dispatch } = useValue();
 
@@ -74,10 +67,7 @@ const Event = () => {
 
     setTableList(resEvents);
     setSubList(resSubEvents);
-    console.log(resSubEvents);
   };
-
-  const handleStore = async (values) => {};
 
   const handleCategory = async (e) => {
     try {
@@ -97,7 +87,17 @@ const Event = () => {
     }
   };
   const handleSubEvent = async (e) => {
-    try {
+    // console.log(e);
+
+    if (e.event_id) {
+      dispatch({
+        type: actions.UPDATE_SUBEVENT,
+        payload: {
+          event_id: e.event_id,
+          id: e.id,
+        },
+      });
+    } else {
       const res = await showEvent(e.original.id);
 
       if (res.status === 200) {
@@ -107,8 +107,10 @@ const Event = () => {
             event_id: res.data.event.id,
           },
         });
-        setOpenSubEvent(true);
       }
+    }
+    setOpenSubEvent(true);
+    try {
     } catch (error) {
       console.log(error);
     }
@@ -151,6 +153,7 @@ const Event = () => {
   };
 
   const handleDelete = async (e) => {
+    console.log(e);
     try {
       Swal.fire({
         title: "Do you want to delete?",
@@ -174,12 +177,63 @@ const Event = () => {
     }
   };
 
+  const handleDeleteSubEvent = async (e) => {
+    console.log(e);
+    try {
+      Swal.fire({
+        title: `Do you want to delete ${e.title}?`,
+        showCancelButton: true,
+        confirmButtonText: "Delete",
+        confirmButtonColor: "#d33",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: "Deleted!",
+            icon: "success",
+            showConfirmButton: false,
+            timer: 2000,
+          });
+          const res = await deleteSubEvent(e.id);
+          fetch();
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleEditEvent = async (e) => {
+    try {
+      const res = await showEvent(e.original.id);
+
+      dispatch({
+        type: actions.UPDATE_EVENT,
+        payload: {
+          id: e.original.id,
+          title: e.original.title,
+          description: e.original.description,
+          date: e.original.date,
+        },
+      });
+      console.log(res);
+    } catch (error) {}
+    setOpenEvent(true);
+  };
+
+  const handleSettingsEvent = async (e) => {
+    setOpenSettingsEvent(true);
+  };
+
   const handleClose = () => {
     setOpenEvent(false);
     setOpenCategory(false);
     setOpenContestants(false);
     setOpenScore(false);
     setOpenSubEvent(false);
+    setOpenSettingsEvent(false);
+
+    dispatch({ type: actions.RESET_EVENT });
+    dispatch({ type: actions.RESET_SUBEVENT });
     fetch();
   };
 
@@ -193,21 +247,21 @@ const Event = () => {
         accessorKey: "title",
         header: "Title",
       },
-      {
-        accessorKey: "description",
-        header: "Description",
-        Cell: ({ cell }) => (
-          <Box
-            sx={{
-              maxWidth: "500px",
-              wordWrap: "break-word",
-              whiteSpace: "normal",
-            }}
-          >
-            {cell.getValue()}
-          </Box>
-        ),
-      },
+      // {
+      //   accessorKey: "description",
+      //   header: "Description",
+      //   Cell: ({ cell }) => (
+      //     <Box
+      //       sx={{
+      //         maxWidth: "500px",
+      //         wordWrap: "break-word",
+      //         whiteSpace: "normal",
+      //       }}
+      //     >
+      //       {cell.getValue()}
+      //     </Box>
+      //   ),
+      // },
       {
         accessorKey: "date",
         header: "Date",
@@ -247,13 +301,42 @@ const Event = () => {
                 },
               }}
               renderRowActions={({ row, table }) => (
-                <Box sx={{ display: "flex", gap: "1rem" }}>
+                <Box sx={{ display: "flex", width: 0 }}>
                   <Tooltip arrow placement="left" title="Sub Event">
                     <IconButton
                       color="primary"
                       onClick={(e) => handleSubEvent(row)}
                     >
-                      <FontAwesomeIcon icon={faLayerGroup} />
+                      <FontAwesomeIcon icon={faCalendarPlus} size="xs" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip arrow placement="left" title="Edit Event">
+                    <IconButton
+                      color="success"
+                      onClick={(e) => handleEditEvent(row)}
+                    >
+                      <FontAwesomeIcon icon={faPenToSquare} size="xs" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip arrow placement="right" title="Event Settings">
+                    <IconButton
+                      onClick={(e) => {
+                        handleSettingsEvent(row);
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        icon={faGear}
+                        size="xs"
+                        style={{ color: "#5c5c5c" }}
+                      />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip arrow placement="right" title="Delete">
+                    <IconButton
+                      color="error"
+                      onClick={(e) => handleDelete(row)}
+                    >
+                      <FontAwesomeIcon icon={faTrashCan} size="xs" />
                     </IconButton>
                   </Tooltip>
                 </Box>
@@ -272,46 +355,92 @@ const Event = () => {
                   {subList
                     .filter((item) => item.event_id === row.original.id) // Filter the subList based on the account in tableList row
                     .map((item) => (
-                      <Box sx={{ display: "flex", gap: "1rem" }} key={item.id}>
-                        <Tooltip arrow placement="left" title="Category">
-                          <IconButton
-                            color="primary"
-                            onClick={(e) => handleCategory(row)}
-                          >
-                            <FontAwesomeIcon icon={faLayerGroup} />
-                          </IconButton>
-                        </Tooltip>
+                      <Box
+                        key={item.id + item.event_id}
+                        sx={{
+                          display: "flex",
 
-                        <Tooltip arrow placement="right" title="Contestants">
-                          <IconButton
-                            // color="success"
-                            onClick={(e) => {
-                              handleContestant(row);
-                            }}
-                          >
-                            <FontAwesomeIcon icon={faChessQueen} />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip arrow placement="right" title="Score">
-                          <IconButton
-                            color="warning"
-                            onClick={(e) => {
-                              handleScore(row);
-                            }}
-                          >
-                            <FontAwesomeIcon icon={faSquarePollHorizontal} />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip arrow placement="right" title="Delete">
-                          <IconButton
-                            color="error"
-                            onClick={(e) => handleDelete(row)}
-                          >
-                            <Delete />
-                          </IconButton>
-                        </Tooltip>
+                          alignItems: "center",
+                        }}
+                      >
+                        <Box>
+                          <Tooltip arrow placement="left" title="Category">
+                            <IconButton
+                              color="primary"
+                              onClick={(e) => handleCategory(row)}
+                            >
+                              <FontAwesomeIcon icon={faCirclePlus} size="xs" />
+                            </IconButton>
+                          </Tooltip>
 
-                        <Typography>{item.title}</Typography>
+                          <Tooltip
+                            arrow
+                            placement="left"
+                            title="Edit Sub  Event"
+                          >
+                            <IconButton
+                              color="success"
+                              onClick={(e) => handleSubEvent(item)}
+                            >
+                              <FontAwesomeIcon icon={faPenToSquare} size="xs" />
+                            </IconButton>
+                          </Tooltip>
+
+                          <Tooltip arrow placement="right" title="Contestants">
+                            <IconButton
+                              // color="success"
+                              onClick={(e) => {
+                                handleContestant(row);
+                              }}
+                            >
+                              <FontAwesomeIcon icon={faChessQueen} size="xs" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip arrow placement="right" title="Score">
+                            <IconButton
+                              color="warning"
+                              onClick={(e) => {
+                                handleScore(row);
+                              }}
+                            >
+                              <FontAwesomeIcon
+                                icon={faSquarePollVertical}
+                                size="xs"
+                              />
+                            </IconButton>
+                          </Tooltip>
+
+                          <Tooltip
+                            arrow
+                            placement="right"
+                            title="Delete Sub Event"
+                          >
+                            <IconButton
+                              color="error"
+                              onClick={(e) => handleDeleteSubEvent(item)}
+                            >
+                              <FontAwesomeIcon icon={faTrashCan} size="xs" />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+
+                        <Stack
+                          direction="row"
+                          justifyContent="space-around"
+                          alignItems="center"
+                          spacing={2}
+                        >
+                          <Typography
+                            sx={{ fontWeight: "bold", marginLeft: 2 }}
+                          >
+                            {item.title}
+                          </Typography>
+                          <Typography
+                            sx={{ fontWeight: "bold", marginLeft: 2 }}
+                          >
+                            {item.date}
+                          </Typography>
+                        </Stack>
                       </Box>
                     ))}
                 </>
@@ -334,6 +463,10 @@ const Event = () => {
         <AddEditScore openEvent={openScore} handleCloseEvent={handleClose} />
         <AddEditSubEventDialog
           openEvent={openSubEvent}
+          handleCloseEvent={handleClose}
+        />
+        <AddEditSettingsEventDialog
+          openEvent={openSettingsEvent}
           handleCloseEvent={handleClose}
         />
       </Box>

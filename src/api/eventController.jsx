@@ -46,7 +46,19 @@ export const showEvent = async (id) => {
   }
 };
 
-//Update the specified user in storage.
+//Update the specified data in storage.
+export const updateEvent = async (value) => {
+  try {
+    const res = await axios.put(`${apiUrl}events/${value.id}`, {
+      title: value.title,
+      description: value.description,
+      date: value.date,
+    });
+    return res;
+  } catch (error) {
+    console.log("post error:", error);
+  }
+};
 
 //Remove the specified user from storage
 export const deleteEvent = async (id) => {
