@@ -7,6 +7,7 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  DialogContentText,
   DialogTitle,
   Grid,
   IconButton,
@@ -42,26 +43,26 @@ import Slide from "@mui/material/Slide";
 const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
   const [startDate, setStartDate] = useState(dayjs());
   const [tableList, setTableList] = useState([{}]);
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState({});
 
   const {
-    state: { contestant },
+    state: { contestant, subEvent },
     dispatch,
   } = useValue();
 
+  const imgUrl = process.env.REACT_APP_IMG;
   const actions = actionHelper();
 
-  useEffect(() => {
-   
-  }, [])
-  
+  useEffect(() => {}, []);
 
   const handleSubmit = async (values) => {
+    // console.log(values);
+    // console.log({ image });
     try {
       const dateFormatted = formatDatePicker(startDate.$d);
       let inputs = values;
       inputs.dateOfBirth = dateFormatted;
-
+      inputs.image = image;
       const res = await storeContestant(inputs);
       Swal.fire({
         icon: "success",
@@ -71,6 +72,7 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
       });
       handleCloseEvent();
     } catch (error) {
+      console.log(error);
       Swal.fire({
         icon: "error",
         title: "Oops...",
@@ -85,9 +87,9 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
   const handleDelete = async () => {};
 
   const handleImageChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setImage(URL.createObjectURL(e.target.files[0]));
-    }
+    const selectedImage = e.target.files[0];
+    console.log(selectedImage);
+    setImage(selectedImage);
   };
 
   const handleUpload = () => {
@@ -98,69 +100,70 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
   const textInput = [
     {
       name: "cotestant_number",
-      label: "Contestant Number",
-      md: 4,
+      label: "Contestant Order",
+      md: 12,
     },
     {
       name: "name",
       label: "Name",
-      md: 4,
+      md: 12,
     },
     {
       name: "municipality",
       label: "Municipality",
-      md: 4,
+      md: 12,
     },
+    // {
+    //   name: "weight",
+    //   label: "Weight",
+    //   md: 3,
+    // },
+    // {
+    //   name: "height",
+    //   label: "Height",
+    //   md: 3,
+    // },
+    // {
+    //   name: "shoeSize",
+    //   label: "Shoe Size",
+    //   md: 3,
+    // },
+    // {
+    //   name: "swimsuitSize",
+    //   label: "Swimsuit Size",
+    //   md: 3,
+    // },
+
     {
-      name: "weight",
-      label: "Weight",
-      md: 3,
+      name: "nickname",
+      label: "Nickname",
+      md: 12,
     },
+
+    // {
+    //   name: "birthPlace",
+    //   label: "Birth Place",
+    //   md: 3,
+    // },
     {
-      name: "height",
-      label: "Height",
-      md: 3,
-    },
-    {
-      name: "shoeSize",
-      label: "Shoe Size",
-      md: 3,
-    },
-    {
-      name: "swimsuitSize",
-      label: "Swimsuit Size",
-      md: 3,
+      name: "age",
+      label: "Age",
+      md: 12,
     },
     {
       name: "bust",
       label: "Bust",
-      md: 3,
+      md: 12,
     },
     {
       name: "waist",
       label: "Waist",
-      md: 3,
+      md: 12,
     },
     {
       name: "hips",
       label: "Hips",
-      md: 3,
-    },
-    {
-      name: "nickname",
-      label: "Nickname",
-      md: 3,
-    },
-
-    {
-      name: "birthPlace",
-      label: "Birth Place",
-      md: 3,
-    },
-    {
-      name: "age",
-      label: "Age",
-      md: 3,
+      md: 12,
     },
   ];
 
@@ -168,31 +171,32 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
     name: Yup.string().required("Please enter name"),
     municipality: Yup.string().required("Please enter municipality"),
     age: Yup.string().required("Please enter age"),
-    weight: Yup.string().required("Please enter weight"),
-    height: Yup.string().required("Please enter height"),
-    shoeSize: Yup.string().required("Please enter shoe size"),
-    swimsuitSize: Yup.string().required("Please enter swimsuit size"),
+    nickname: Yup.string().required("Please enter nickname"),
     bust: Yup.string().required("Please enter bust"),
     waist: Yup.string().required("Please enter waist"),
     hips: Yup.string().required("Please enter hips"),
-    nickname: Yup.string().required("Please enter nickname"),
-    birthPlace: Yup.string().required("Please enter birth place"),
+    // weight: Yup.string().required("Please enter weight"),
+    // height: Yup.string().required("Please enter height"),
+    // shoeSize: Yup.string().required("Please enter shoe size"),
+    // swimsuitSize: Yup.string().required("Please enter swimsuit size"),
+    // birthPlace: Yup.string().required("Please enter birth place"),
   });
 
   return (
     <Dialog
       open={openEvent}
       fullWidth={true}
-      maxWidth="xl"
+      maxWidth="md"
       TransitionComponent={Transition}
     >
+      <DialogTitle>Contestant Details</DialogTitle>
       <DialogContent>
         <Formik
           initialValues={{ ...contestant }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          <Form>
+          <Form encType="multipart/form-data">
             <Grid container spacing={1} justifyContent="center" p={1}>
               <Card>
                 <Stack
@@ -211,9 +215,10 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
                           type="file"
                           style={{ display: "none" }}
                           onChange={handleImageChange}
+                          name="image"
                         />
                         <Avatar
-                          src={"../../.assets/noImage.png"}
+                          src={`${imgUrl}qrcode.png`}
                           sx={{ width: 250, height: 250, cursor: "pointer" }}
                         />
                       </label>
@@ -231,7 +236,7 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
                       );
                     })}
 
-                    <Grid item md={3}>
+                    {/* <Grid item md={3}>
                       <DesktopDatePicker
                         name="apDate"
                         label="Date of Birth"
@@ -241,7 +246,7 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
                         slotProps={{ textField: { size: "small" } }}
                         sx={{ width: "100%" }}
                       />
-                    </Grid>
+                    </Grid> */}
                   </Grid>
                 </Stack>
               </Card>

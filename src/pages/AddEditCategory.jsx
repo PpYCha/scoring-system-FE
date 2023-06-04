@@ -1,13 +1,17 @@
 import {
   Box,
+  Paper,
   Dialog,
   DialogActions,
   DialogContent,
+  DialogContentText,
   DialogTitle,
   Grid,
   IconButton,
   Stack,
   Tooltip,
+  Typography,
+  Divider,
 } from "@mui/material";
 import { Form, Formik } from "formik";
 import React, { useEffect, useMemo, useState } from "react";
@@ -35,6 +39,7 @@ import { useValue } from "../context/ContextProvider";
 import actionHelper from "../context/actionHelper";
 import { type } from "@testing-library/user-event/dist/type";
 import {
+  faArrowRight,
   faPenToSquare,
   faScaleUnbalancedFlip,
 } from "@fortawesome/free-solid-svg-icons";
@@ -59,19 +64,22 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
 
   const fetch = async () => {
     const res = await indexCategories();
-
+    console.log(category);
     const filteredList = res.filter(
-      (item) => item.event_id === category.event_id
+      (item) =>
+        item.event_id === category.event_id &&
+        item.subEvent_id === category.subEvent_id
     );
     setTableList(filteredList);
   };
 
   const handleSubmit = async (values) => {
+    dispatch({ type: actions.START_LOADING });
     try {
       const dateFormatted = formatDatePicker(startDate.$d);
       let inputs = values;
       inputs.date = dateFormatted;
-
+      console.log(inputs);
       const res = await storeCategory(inputs);
       Swal.fire({
         icon: "success",
@@ -88,6 +96,7 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
       });
       console.log(error);
     }
+    dispatch({ type: actions.END_LOADING });
   };
 
   const handleEdit = (row) => {
@@ -100,6 +109,7 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
         percentage: row.original.percentage,
       },
     });
+    dispatch({ type: actions.END_LOADING });
   };
 
   const handleDelete = async (e) => {
@@ -128,17 +138,14 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
 
   const handleCriteria = async (e) => {
     try {
-      const res = await showCategory(e.original.id);
-
-      if (res.status === 200) {
-        dispatch({
-          type: actions.UPDATE_CRITERIA,
-          payload: {
-            category_id: res.data.category.id,
-          },
-        });
-        setOpenCriteria(true);
-      }
+      dispatch({
+        type: actions.UPDATE_CRITERIA,
+        payload: {
+          category_id: e.original.id,
+          categoryTitle: e.original.category,
+        },
+      });
+      setOpenCriteria(true);
     } catch (error) {
       console.log(error);
     }
@@ -152,17 +159,17 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
     {
       name: "category",
       label: "Category",
-      md: 12,
+      md: 6,
     },
-    {
-      name: "description",
-      label: "Description",
-      md: 12,
-    },
+    // {
+    //   name: "description",
+    //   label: "Description",
+    //   md: 12,
+    // },
     {
       name: "percentage",
       label: "Percentage",
-      md: 12,
+      md: 6,
     },
   ];
 
@@ -181,21 +188,21 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
         accessorKey: "category",
         header: "Category",
       },
-      {
-        accessorKey: "description",
-        header: "Description",
-        Cell: ({ cell }) => (
-          <Box
-            sx={{
-              maxWidth: "500px",
-              wordWrap: "break-word",
-              whiteSpace: "normal",
-            }}
-          >
-            {cell.getValue()}
-          </Box>
-        ),
-      },
+      // {
+      //   accessorKey: "description",
+      //   header: "Description",
+      //   Cell: ({ cell }) => (
+      //     <Box
+      //       sx={{
+      //         maxWidth: "500px",
+      //         wordWrap: "break-word",
+      //         whiteSpace: "normal",
+      //       }}
+      //     >
+      //       {cell.getValue()}
+      //     </Box>
+      //   ),
+      // },
       {
         accessorKey: "percentage",
         header: "Percentage",
@@ -223,8 +230,18 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
 
   return (
     <>
-      <Dialog open={openEvent} fullWidth={true} maxWidth="xl">
+      <Dialog open={openEvent} fullWidth={true} maxWidth="md">
+        <DialogTitle>Category Details</DialogTitle>
+
         <DialogContent>
+          <DialogContentText m={0} p={0} mb={2}>
+            <Typography m={0} p={0}>
+              {category.title}{" "}
+              <FontAwesomeIcon icon={faArrowRight} size="2xs" />{" "}
+              {category.titleSubEvent}
+            </Typography>
+          </DialogContentText>
+          <Divider variant="fullWidth" sx={{ marginTop: 0, marginBottom: 2 }} />
           <Formik
             initialValues={{ ...category }}
             validationSchema={validationSchema}
@@ -261,14 +278,17 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
                             color="secondary"
                             onClick={(e) => handleCriteria(row)}
                           >
-                            <FontAwesomeIcon icon={faScaleUnbalancedFlip} />
+                            <FontAwesomeIcon
+                              size="xs"
+                              icon={faScaleUnbalancedFlip}
+                            />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip arrow placement="right" title="Edit">
+                        {/* <Tooltip arrow placement="right" title="Edit">
                           <IconButton onClick={(e) => handleEdit(row)}>
-                            <FontAwesomeIcon icon={faPenToSquare} />
+                            <FontAwesomeIcon size="xs" icon={faPenToSquare} />
                           </IconButton>
-                        </Tooltip>
+                        </Tooltip> */}
                         <Tooltip arrow placement="right" title="Delete">
                           <IconButton
                             color="error"

@@ -21,6 +21,7 @@ export const storeCategory = async (value) => {
       description: value.description,
       percentage: value.percentage,
       event_id: value.event_id,
+      subEvent_id: value.subEvent_id,
     });
 
     return res;

@@ -1,9 +1,14 @@
 import {
+  Box,
   Dialog,
   DialogActions,
   DialogContent,
+  DialogContentText,
   DialogTitle,
+  Divider,
   Grid,
+  Stack,
+  Typography,
 } from "@mui/material";
 import { Form, Formik } from "formik";
 import React, { useEffect, useMemo, useState } from "react";
@@ -28,15 +33,20 @@ import {
   indexCriterias,
   storeCriteria,
 } from "../api/criteriaController";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import actionHelper from "../context/actionHelper";
 
 const AddEditCriteria = ({ openEvent, handleCloseEvent }) => {
   const [startDate, setStartDate] = useState(dayjs());
   const [tableList, setTableList] = useState([{}]);
 
   const {
-    state: { criteria },
+    state: { criteria, category },
     dispatch,
   } = useValue();
+
+  const actions = actionHelper();
 
   useEffect(() => {
     fetch();
@@ -52,6 +62,7 @@ const AddEditCriteria = ({ openEvent, handleCloseEvent }) => {
   };
 
   const handleSubmit = async (values) => {
+    dispatch({ type: actions.START_LOADING });
     try {
       const dateFormatted = formatDatePicker(startDate.$d);
       let inputs = values;
@@ -72,6 +83,7 @@ const AddEditCriteria = ({ openEvent, handleCloseEvent }) => {
         text: JSON.stringify(error.errors),
       });
     }
+    dispatch({ type: actions.END_LOADING });
   };
 
   const handleDelete = async (e) => {
@@ -111,23 +123,37 @@ const AddEditCriteria = ({ openEvent, handleCloseEvent }) => {
     },
   ];
 
-  const columns = useMemo(
-    () => [
+  const columns = useMemo(() => {
+    const totalPercentage = tableList.reduce(
+      (acc, curr) => acc + parseInt(curr.percentage),
+      0
+    );
+
+    return [
       {
         accessorKey: "id",
         header: "ID",
       },
       {
         accessorKey: "description",
-        header: "Description",
+        header: "Criteria",
       },
       {
         accessorKey: "percentage",
         header: "Percentage",
+        Footer: () => (
+          <Stack>
+            Total:
+            <Box
+              color={totalPercentage === 100 ? "success.main" : "warning.main"}
+            >
+              {totalPercentage}%
+            </Box>
+          </Stack>
+        ),
       },
-    ],
-    []
-  );
+    ];
+  }, [tableList]);
 
   const cVisibility = { id: false };
 
@@ -137,8 +163,18 @@ const AddEditCriteria = ({ openEvent, handleCloseEvent }) => {
   });
 
   return (
-    <Dialog open={openEvent} fullWidth={true} maxWidth="lg">
+    <Dialog open={openEvent} fullWidth={true} maxWidth="md">
+      <DialogTitle>Criteria Details</DialogTitle>
       <DialogContent>
+        <DialogContentText m={0} p={0} mb={2}>
+          <Typography m={0} p={0}>
+            {category.title} <FontAwesomeIcon icon={faArrowRight} size="2xs" />{" "}
+            {category.titleSubEvent}{" "}
+            <FontAwesomeIcon icon={faArrowRight} size="2xs" />{" "}
+            {criteria.categoryTitle}
+          </Typography>
+        </DialogContentText>
+        <Divider variant="fullWidth" sx={{ marginTop: 0, marginBottom: 2 }} />
         <Formik
           initialValues={{ ...criteria }}
           validationSchema={validationSchema}

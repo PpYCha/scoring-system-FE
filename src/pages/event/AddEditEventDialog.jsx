@@ -84,7 +84,7 @@ const AddEditEventDialog = ({ openEvent, handleCloseEvent }) => {
   });
 
   return (
-    <Dialog open={openEvent} fullWidth={true} maxWidth="lg">
+    <Dialog open={openEvent} fullWidth={true} maxWidth="md">
       <DialogTitle>Event Details</DialogTitle>
       <DialogContent>
         <Formik

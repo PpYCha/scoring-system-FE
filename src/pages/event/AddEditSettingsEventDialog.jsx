@@ -103,7 +103,7 @@ const AddEditSettingsEventDialog = ({ openEvent, handleCloseEvent }) => {
   });
 
   return (
-    <Dialog open={openEvent} fullWidth={true} maxWidth="lg">
+    <Dialog open={openEvent} fullWidth={true} maxWidth="md">
       <DialogTitle variant="h5">Settings</DialogTitle>
       <DialogContent>
         <Formik

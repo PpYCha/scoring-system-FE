@@ -15,25 +15,31 @@ export const indexContestants = async () => {
 
 // Store a newly created user in storage.
 export const storeContestant = async (value) => {
-  try {
-    const res = await axios.post(`${apiUrl}contestants`, {
-      name: value.name,
-      municipality: value.municipality,
-      age: value.age,
-      weight: value.weight,
-      height: value.height,
-      shoeSize: value.shoeSize,
-      swimsuitSize: value.swimsuitSize,
-      bust: value.bust,
-      waist: value.waist,
-      hips: value.hips,
-      nickname: value.nickname,
-      dateOfBirth: value.dateOfBirth,
-      birthPlace: value.birthPlace,
-      event_id: value.event_id,
-      cotestant_number: value.cotestant_number,
-    });
+  const formData = new FormData();
+  formData.append("name", value.name);
+  formData.append("municipality", value.municipality);
+  formData.append("age", value.age);
+  formData.append("weight", value.weight);
+  formData.append("height", value.height);
+  formData.append("shoeSize", value.shoeSize);
+  formData.append("swimsuitSize", value.swimsuitSize);
+  formData.append("bust", value.bust);
+  formData.append("waist", value.waist);
+  formData.append("hips", value.hips);
+  formData.append("nickname", value.nickname);
+  formData.append("dateOfBirth", value.dateOfBirth);
+  formData.append("birthPlace", value.birthPlace);
+  formData.append("event_id", value.event_id);
+  formData.append("cotestant_number", value.cotestant_number);
+  formData.append("subEvent_id", value.subEvent_id);
+  formData.append("image", value.image);
 
+  try {
+    const res = await axios.post(`${apiUrl}contestants`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data", // Set the content type to multipart/form-data
+      },
+    });
     return res;
   } catch (error) {
     if (error.response.status === 422) {

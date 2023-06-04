@@ -69,19 +69,18 @@ const Event = () => {
     setSubList(resSubEvents);
   };
 
-  const handleCategory = async (e) => {
+  const handleCategory = async (row, item) => {
     try {
-      const res = await showEvent(e.original.id);
-
-      if (res.status === 200) {
-        dispatch({
-          type: actions.UPDATE_CATEGORY,
-          payload: {
-            event_id: res.data.event.id,
-          },
-        });
-        setOpenCategory(true);
-      }
+      dispatch({
+        type: actions.UPDATE_CATEGORY,
+        payload: {
+          event_id: row.original.id,
+          subEvent_id: item.id,
+          titleSubEvent: item.title,
+          title: row.original.title,
+        },
+      });
+      setOpenCategory(true);
     } catch (error) {
       console.log(error);
     }
@@ -90,9 +89,12 @@ const Event = () => {
     // console.log(e);
 
     if (e.event_id) {
+      console.log(e);
       dispatch({
         type: actions.UPDATE_SUBEVENT,
         payload: {
+          title: e.title,
+          date: e.date,
           event_id: e.event_id,
           id: e.id,
         },
@@ -116,19 +118,16 @@ const Event = () => {
     }
   };
 
-  const handleContestant = async (e) => {
+  const handleContestant = async (e, item) => {
     try {
-      const res = await showEvent(e.original.id);
-
-      if (res.status === 200) {
-        dispatch({
-          type: actions.UPDATE_CONTESTANT,
-          payload: {
-            event_id: res.data.event.id,
-          },
-        });
-        navigate(navigateContestants);
-      }
+      dispatch({
+        type: actions.UPDATE_CONTESTANT,
+        payload: {
+          event_id: e.original.id,
+          subEvent_id: item.id,
+        },
+      });
+      navigate(navigateContestants);
     } catch (error) {
       console.log(error);
     }
@@ -336,7 +335,8 @@ const Event = () => {
                       color="error"
                       onClick={(e) => handleDelete(row)}
                     >
-                      <FontAwesomeIcon icon={faTrashCan} size="xs" />
+                      {/* <FontAwesomeIcon icon={faTrashCan} size="xs" /> */}
+                      <Delete />
                     </IconButton>
                   </Tooltip>
                 </Box>
@@ -367,7 +367,7 @@ const Event = () => {
                           <Tooltip arrow placement="left" title="Category">
                             <IconButton
                               color="primary"
-                              onClick={(e) => handleCategory(row)}
+                              onClick={(e) => handleCategory(row, item)}
                             >
                               <FontAwesomeIcon icon={faCirclePlus} size="xs" />
                             </IconButton>
@@ -390,7 +390,7 @@ const Event = () => {
                             <IconButton
                               // color="success"
                               onClick={(e) => {
-                                handleContestant(row);
+                                handleContestant(row, item);
                               }}
                             >
                               <FontAwesomeIcon icon={faChessQueen} size="xs" />
@@ -419,7 +419,8 @@ const Event = () => {
                               color="error"
                               onClick={(e) => handleDeleteSubEvent(item)}
                             >
-                              <FontAwesomeIcon icon={faTrashCan} size="xs" />
+                              {/* <FontAwesomeIcon icon={faTrashCan} size="xs" /> */}
+                              <Delete />
                             </IconButton>
                           </Tooltip>
                         </Box>

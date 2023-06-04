@@ -19,6 +19,8 @@ import Swal from "sweetalert2";
 import { formatDatePicker } from "../../utils/formatter";
 import { useValue } from "../../context/ContextProvider";
 import { storeSubEvent, updateSubEvent } from "../../api/subEventController";
+import actionHelper from "../../context/actionHelper";
+import { CallToActionSharp } from "@mui/icons-material";
 
 const AddEditSubEventDialog = ({ openEvent, handleCloseEvent }) => {
   const [startDate, setStartDate] = useState(dayjs());
@@ -28,7 +30,10 @@ const AddEditSubEventDialog = ({ openEvent, handleCloseEvent }) => {
     dispatch,
   } = useValue();
 
+  const actions = actionHelper();
+
   const handleSubmit = async (values) => {
+    dispatch({ type: actions.START_LOADING });
     try {
       let res;
       const dateFormatted = formatDatePicker(startDate.$d);
@@ -55,6 +60,7 @@ const AddEditSubEventDialog = ({ openEvent, handleCloseEvent }) => {
         text: JSON.stringify(error.errors),
       });
     }
+    dispatch({ type: actions.END_LOADING });
   };
 
   const textInput = [
@@ -70,7 +76,7 @@ const AddEditSubEventDialog = ({ openEvent, handleCloseEvent }) => {
   });
 
   return (
-    <Dialog open={openEvent} fullWidth={true} maxWidth="lg">
+    <Dialog open={openEvent} fullWidth={true} maxWidth="md">
       <DialogTitle>Sub Event Details</DialogTitle>
       <DialogContent>
         <Formik

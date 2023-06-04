@@ -32,6 +32,8 @@ import {
 } from "../../api/contestantController";
 import { indexCategories } from "../../api/categoryController";
 import AddEditContestant from "./AddEditContestant";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 
 const Contestant = () => {
   const [tableList, setTableList] = useState([{}]);
@@ -43,6 +45,7 @@ const Contestant = () => {
     dispatch,
   } = useValue();
 
+  const imgUrl = process.env.REACT_APP_IMG;
   const actions = actionHelper();
 
   useEffect(() => {
@@ -52,10 +55,38 @@ const Contestant = () => {
   const fetch = async () => {
     const res = await indexContestants();
     const filteredList = res.filter(
-      (item) => item.event_id === contestant.event_id
+      (item) =>
+        item.event_id === contestant.event_id &&
+        item.subEvent_id === contestant.subEvent_id
     );
 
     setTableList(filteredList);
+  };
+
+  const handleEditContestant = async (e) => {
+    dispatch({
+      type: actions.UPDATE_CONTESTANT,
+      payload: {
+        name: e.original.name,
+        municipality: e.original.municipality,
+        age: e.original.age,
+        bust: e.original.bust,
+        waist: e.original.waist,
+        hips: e.original.hips,
+        nickname: e.original.nickname,
+        event_id: e.original.event_id,
+        cotestant_number: e.original.cotestant_number,
+        subEvent_id: e.original.subEvent_id,
+        weight: "",
+        height: "",
+        shoeSize: "",
+        swimsuitSize: "",
+        dateOfBirth: "",
+        birthPlace: "",
+      },
+    });
+
+    setOpenContestants(true);
   };
 
   const handleDelete = async (e) => {
@@ -83,6 +114,27 @@ const Contestant = () => {
   };
 
   const handleClose = () => {
+    dispatch({
+      type: actions.UPDATE_CONTESTANT,
+      payload: {
+        name: "",
+        municipality: "",
+        age: "",
+        bust: "",
+        waist: "",
+        hips: "",
+        nickname: "",
+        cotestant_number: "",
+        event_id: contestant.event_id,
+        subEvent_id: contestant.subEvent_id,
+        weight: "",
+        height: "",
+        shoeSize: "",
+        swimsuitSize: "",
+        dateOfBirth: "",
+        birthPlace: "",
+      },
+    });
     setOpenContestants(false);
 
     fetch();
@@ -99,29 +151,52 @@ const Contestant = () => {
         header: "Number",
       },
       {
+        accessorKey: "image",
+        header: "Image",
+      },
+      {
         accessorKey: "name",
         header: "Name",
+        Cell: ({ row, cell }) => (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "1rem",
+            }}
+          >
+            <img
+              alt="avatar"
+              height={30}
+              src={`${imgUrl}${row.original.image}`}
+              loading="lazy"
+              style={{ borderRadius: "50%" }}
+            />
+            {/* using renderedCellValue instead of cell.getValue() preserves filter match highlighting */}
+            <span>{cell.getValue()}</span>
+          </Box>
+        ),
       },
       {
         accessorKey: "municipality",
         header: "Municipality",
       },
-      {
-        accessorKey: "weight",
-        header: "Weight",
-      },
-      {
-        accessorKey: "height",
-        header: "Height",
-      },
-      {
-        accessorKey: "shoeSize",
-        header: "Shoe Size",
-      },
-      {
-        accessorKey: "swimsuitSize",
-        header: "Swimsuit Size",
-      },
+      // {
+      //   accessorKey: "weight",
+      //   header: "Weight",
+      // },
+      // {
+      //   accessorKey: "height",
+      //   header: "Height",
+      // },
+      // {
+      //   accessorKey: "shoeSize",
+      //   header: "Shoe Size",
+      // },
+      // {
+      //   accessorKey: "swimsuitSize",
+      //   header: "Swimsuit Size",
+      // },
       {
         accessorKey: "bust",
         header: "Bust",
@@ -139,10 +214,10 @@ const Contestant = () => {
         header: "Nickname",
       },
 
-      {
-        accessorKey: "birthPlace",
-        header: "Birth Place",
-      },
+      // {
+      //   accessorKey: "birthPlace",
+      //   header: "Birth Place",
+      // },
       {
         accessorKey: "age",
         header: "Age",
@@ -160,7 +235,7 @@ const Contestant = () => {
             m={3}
             justifyContent="space-between"
           >
-            <Typography variant="h5">List of Contestants</Typography>
+            <Typography variant="h5">List of Contestants </Typography>
           </Stack>
           <Box m={2}>
             <MaterialReactTable
@@ -171,7 +246,7 @@ const Contestant = () => {
               enableEditing
               initialState={{
                 density: "compact",
-                columnVisibility: { id: false },
+                columnVisibility: { id: false, image: false },
                 pagination: { pageSize: 30 },
               }}
               enableDensityToggle={false}
@@ -179,14 +254,14 @@ const Contestant = () => {
               enableHiding={false}
               renderRowActions={({ row, table }) => (
                 <Box sx={{ display: "flex", gap: "1rem" }}>
-                  {/* <Tooltip arrow placement="left" title="Criteria">
+                  <Tooltip arrow placement="left" title="Edit Event">
                     <IconButton
-                      color="secondary"
-                      onClick={(e) => handleEdit(row)}
+                      color="success"
+                      onClick={(e) => handleEditContestant(row)}
                     >
-                      <Edit />
+                      <FontAwesomeIcon icon={faPenToSquare} size="xs" />
                     </IconButton>
-                  </Tooltip> */}
+                  </Tooltip>
                   <Tooltip arrow placement="right" title="Delete">
                     <IconButton
                       color="error"
