@@ -44,6 +44,8 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
   const [startDate, setStartDate] = useState(dayjs());
   const [tableList, setTableList] = useState([{}]);
   const [image, setImage] = useState({});
+  const [previewImage, setPreviewImage] = useState({});
+
 
   const {
     state: { contestant, subEvent },
@@ -53,7 +55,9 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
   const imgUrl = process.env.REACT_APP_IMG;
   const actions = actionHelper();
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    
+  }, []);
 
   const handleSubmit = async (values) => {
     // console.log(values);
@@ -81,20 +85,15 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
     }
   };
 
-  const handleEdit = async (e) => {
-    console.log(e.original.id);
-  };
-  const handleDelete = async () => {};
-
   const handleImageChange = (e) => {
     const selectedImage = e.target.files[0];
-    console.log(selectedImage);
     setImage(selectedImage);
+    setPreviewImage(URL.createObjectURL(selectedImage));
   };
 
-  const handleUpload = () => {
-    // Code to save the image to the server or cloud storage goes here
-    console.log("Image uploaded successfully");
+  const handleCloseContestant = () => {
+    setPreviewImage({});
+    handleCloseEvent();
   };
 
   const textInput = [
@@ -196,7 +195,7 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          <Form encType="multipart/form-data">
+          <Form>
             <Grid container spacing={1} justifyContent="center" p={1}>
               <Card>
                 <Stack
@@ -218,7 +217,11 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
                           name="image"
                         />
                         <Avatar
-                          src={`${imgUrl}qrcode.png`}
+                          src={
+                            contestant.img
+                              ? `${imgUrl}${contestant.img}`
+                              : previewImage
+                          }
                           sx={{ width: 250, height: 250, cursor: "pointer" }}
                         />
                       </label>
@@ -253,7 +256,7 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
             </Grid>
             <DialogActions>
               <ButtonSave />
-              <ButtonCancel handleClose={handleCloseEvent} />
+              <ButtonCancel handleClose={handleCloseContestant} />
             </DialogActions>
           </Form>
         </Formik>

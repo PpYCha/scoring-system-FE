@@ -31,7 +31,7 @@ export const storeContestant = async (value) => {
   formData.append("birthPlace", value.birthPlace);
   formData.append("event_id", value.event_id);
   formData.append("cotestant_number", value.cotestant_number);
-  formData.append("subEvent_id", value.subEvent_id);
+  // formData.append("subEvent_id", value.subEvent_id);
   formData.append("image", value.image);
 
   try {

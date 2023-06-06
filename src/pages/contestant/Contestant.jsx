@@ -55,9 +55,7 @@ const Contestant = () => {
   const fetch = async () => {
     const res = await indexContestants();
     const filteredList = res.filter(
-      (item) =>
-        item.event_id === contestant.event_id &&
-        item.subEvent_id === contestant.subEvent_id
+      (item) => item.event_id === contestant.event_id
     );
 
     setTableList(filteredList);
@@ -83,6 +81,7 @@ const Contestant = () => {
         swimsuitSize: "",
         dateOfBirth: "",
         birthPlace: "",
+        image: e.original.image,
       },
     });
 

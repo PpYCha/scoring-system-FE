@@ -33,6 +33,8 @@ import { indexScores } from "../../api/scoreController";
 import { useReactToPrint } from "react-to-print";
 import { useValue } from "../../context/ContextProvider";
 import actionHelper from "../../context/actionHelper";
+import HeaderReport from "./toPrint/HeaderReport";
+import FooterReport from "./toPrint/FooterReport";
 
 const AddEditScore = ({ openEvent, handleCloseEvent }) => {
   const [categories, setCategories] = useState([{}]);
@@ -105,11 +107,24 @@ const AddEditScore = ({ openEvent, handleCloseEvent }) => {
   return (
     <>
       {loading ? null : (
-        <Dialog open={openEvent} fullWidth={true} maxWidth="lg">
+        <Dialog open={openEvent} fullScreen>
           <DialogContent>
-            {/* <TableContainer component={Paper} ref={tableRef}>
+            <TableContainer
+              component={Paper}
+              ref={tableRef}
+              sx={{
+                width: "277mm", // Adjusted width to account for margins
+                height: "190mm", // Adjusted height to account for margins
+                border: "1px solid black",
+                margin: "10mm", // Margins of 10mm on all sides
+              }}
+            >
+              <HeaderReport />
+
               <Table
-                sx={{ minWidth: 700, fontSize: "0.8rem", padding: "8px" }}
+                sx={{
+                  tableLayout: "fixed",
+                }}
                 aria-label="spanning table"
                 size="small"
               >
@@ -171,7 +186,8 @@ const AddEditScore = ({ openEvent, handleCloseEvent }) => {
                   })}
                 </TableBody>
               </Table>
-            </TableContainer> */}
+              <FooterReport />
+            </TableContainer>
 
             <DialogActions>
               <Button onClick={handlePrint} variant="contained">

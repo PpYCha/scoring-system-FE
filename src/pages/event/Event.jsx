@@ -124,7 +124,7 @@ const Event = () => {
         type: actions.UPDATE_CONTESTANT,
         payload: {
           event_id: e.original.id,
-          subEvent_id: item.id,
+          // subEvent_id: item.id,
         },
       });
       navigate(navigateContestants);
@@ -317,6 +317,16 @@ const Event = () => {
                       <FontAwesomeIcon icon={faPenToSquare} size="xs" />
                     </IconButton>
                   </Tooltip>
+                  <Tooltip arrow placement="right" title="Contestants">
+                    <IconButton
+                      // color="success"
+                      onClick={(e) => {
+                        handleContestant(row);
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faChessQueen} size="xs" />
+                    </IconButton>
+                  </Tooltip>
                   <Tooltip arrow placement="right" title="Event Settings">
                     <IconButton
                       onClick={(e) => {
@@ -386,16 +396,6 @@ const Event = () => {
                             </IconButton>
                           </Tooltip>
 
-                          <Tooltip arrow placement="right" title="Contestants">
-                            <IconButton
-                              // color="success"
-                              onClick={(e) => {
-                                handleContestant(row, item);
-                              }}
-                            >
-                              <FontAwesomeIcon icon={faChessQueen} size="xs" />
-                            </IconButton>
-                          </Tooltip>
                           <Tooltip arrow placement="right" title="Score">
                             <IconButton
                               color="warning"
