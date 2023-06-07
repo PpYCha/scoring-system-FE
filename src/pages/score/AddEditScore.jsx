@@ -35,6 +35,7 @@ import { useValue } from "../../context/ContextProvider";
 import actionHelper from "../../context/actionHelper";
 import HeaderReport from "./toPrint/HeaderReport";
 import FooterReport from "./toPrint/FooterReport";
+import { indexContestantsEvents } from "../../api/contestantEventController";
 
 const AddEditScore = ({ openEvent, handleCloseEvent }) => {
   const [categories, setCategories] = useState([{}]);
@@ -44,7 +45,7 @@ const AddEditScore = ({ openEvent, handleCloseEvent }) => {
   const tableRef = useRef();
 
   const {
-    state: { loading },
+    state: { loading, contestant },
     dispatch,
   } = useValue();
 
@@ -55,11 +56,13 @@ const AddEditScore = ({ openEvent, handleCloseEvent }) => {
   }, []);
 
   const fetch = async () => {
-    const [resContestant, resCategories, resScore] = await Promise.all([
-      indexContestants(),
-      indexCategories(),
-      indexScores(),
-    ]);
+    const [resContestant, resCategories, resScore, resContestantsEvents] =
+      await Promise.all([
+        indexContestants(),
+        indexCategories(),
+        indexScores(),
+        indexContestantsEvents(),
+      ]);
 
     const combinedData = resContestant.map((contestant) => {
       const contestantScores = resScore.filter(
@@ -96,8 +99,13 @@ const AddEditScore = ({ openEvent, handleCloseEvent }) => {
       };
     });
 
+    const filteredCategories = resCategories.filter(
+      (item) => item.subEvent_id === contestant.subEvent_id
+    );
+
+    console.log(filteredCategories);
     setContestants(combinedData);
-    setCategories(resCategories);
+    setCategories(filteredCategories);
   };
 
   const handlePrint = useReactToPrint({
@@ -113,9 +121,10 @@ const AddEditScore = ({ openEvent, handleCloseEvent }) => {
               component={Paper}
               ref={tableRef}
               sx={{
-                width: "277mm", // Adjusted width to account for margins
-                height: "190mm", // Adjusted height to account for margins
-                border: "1px solid black",
+                width: "190mm", // Adjusted width to account for margins
+                // width: "277mm", // Adjusted width to account for margins
+                // height: "190mm", // Adjusted height to account for margins
+                // border: "1px solid black",
                 margin: "10mm", // Margins of 10mm on all sides
               }}
             >
@@ -125,14 +134,20 @@ const AddEditScore = ({ openEvent, handleCloseEvent }) => {
                 sx={{
                   tableLayout: "fixed",
                 }}
-                aria-label="spanning table"
                 size="small"
+                aria-label="a dense table"
               >
-                <TableHead>
+                <TableHead sx={{ backgroundColor: "gray", color: "white" }}>
                   <TableRow>
-                    <TableCell>Contestant</TableCell>
+                    <TableCell sx={{ width: 125, fontSize: 12 }}>
+                      Contestant
+                    </TableCell>
                     {categories.map((item) => (
-                      <TableCell key={item.category} align="left">
+                      <TableCell
+                        key={item.category}
+                        align="left"
+                        sx={{ fontSize: 12 }}
+                      >
                         {item.category}({item.percentage}%)
                       </TableCell>
                     ))}
@@ -162,13 +177,21 @@ const AddEditScore = ({ openEvent, handleCloseEvent }) => {
                             const calculatedScore = totalScore * totalWeight;
                             totalScores.push(calculatedScore);
                             return (
-                              <TableCell key={category.id} align="left">
+                              <TableCell
+                                key={category.id}
+                                align="left"
+                                sx={{ fontSize: 10 }}
+                              >
                                 {totalScore}
                               </TableCell>
                             );
                           } else {
                             return (
-                              <TableCell key={category.id} align="left">
+                              <TableCell
+                                key={category.id}
+                                align="left"
+                                sx={{ fontSize: 10 }}
+                              >
                                 <span style={{ color: "red" }}>N/A</span>
                               </TableCell>
                             );

@@ -10,7 +10,7 @@ const HeaderReport = () => {
       justifyContent="space-around"
       alignItems="center"
       spacing={2}
-      mb={2}
+      mb={1}
     >
       <img src={mutyaLogo2023} alt="mutya" width="150" height="150" />
 
@@ -25,7 +25,7 @@ const HeaderReport = () => {
           Provincial Tourism Office
         </Typography>
         <Typography variant="h6" mb={-1}>
-          Mutya san Ibabao 2023 Overall Score
+          Mutya san Ibabao 2023 Score
         </Typography>
       </Box>
       <img src={ibabaoFestivalLogo} alt="mutya" width="150" height="150" />

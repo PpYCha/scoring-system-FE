@@ -4,6 +4,8 @@ import {
   Button,
   FormControlLabel,
   IconButton,
+  Menu,
+  MenuItem,
   Paper,
   Stack,
   Switch,
@@ -49,6 +51,15 @@ const Event = () => {
   const [openContestants, setOpenContestants] = useState(false);
   const [openScore, setOpenScore] = useState(false);
   const [openSettingsEvent, setOpenSettingsEvent] = useState(false);
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const openScoreMenu = Boolean(anchorEl);
+  const handleClickOpenScoreMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleCloseScoreMenu = () => {
+    setAnchorEl(null);
+  };
 
   const { dispatch } = useValue();
 
@@ -135,17 +146,17 @@ const Event = () => {
 
   const handleScore = async (e) => {
     try {
-      const res = await showEvent(e.original.id);
+      dispatch({ type: actions.START_LOADING });
+      dispatch({
+        type: actions.UPDATE_CONTESTANT,
+        payload: {
+          event_id: e.original.id,
+          // subEvent_id: e.original.id,
+        },
+      });
 
-      if (res.status === 200) {
-        dispatch({
-          type: actions.UPDATE_CONTESTANT,
-          payload: {
-            event_id: res.data.event.id,
-          },
-        });
-        setOpenScore(true);
-      }
+      dispatch({ type: actions.END_LOADING });
+      setOpenScore(true);
     } catch (error) {
       console.log(error);
     }
@@ -317,6 +328,7 @@ const Event = () => {
                       <FontAwesomeIcon icon={faPenToSquare} size="xs" />
                     </IconButton>
                   </Tooltip>
+
                   <Tooltip arrow placement="right" title="Contestants">
                     <IconButton
                       // color="success"
@@ -327,6 +339,49 @@ const Event = () => {
                       <FontAwesomeIcon icon={faChessQueen} size="xs" />
                     </IconButton>
                   </Tooltip>
+                  <Tooltip arrow placement="right" title="Score">
+                    <IconButton
+                      color="warning"
+                      // onClick={(e) => {
+                      //   handleScore(row, item);
+                      // }}
+                      aria-controls={
+                        openScoreMenu ? "demo-positioned-menu" : undefined
+                      }
+                      aria-haspopup="true"
+                      aria-expanded={openScoreMenu ? "true" : undefined}
+                      onClick={handleClickOpenScoreMenu}
+                    >
+                      <FontAwesomeIcon icon={faSquarePollVertical} size="xs" />
+                    </IconButton>
+                  </Tooltip>
+                  <Menu
+                    id="demo-positioned-menu"
+                    aria-labelledby="demo-positioned-button"
+                    anchorEl={anchorEl}
+                    open={openScoreMenu}
+                    onClose={handleCloseScoreMenu}
+                    anchorOrigin={{
+                      vertical: "top",
+                      horizontal: "left",
+                    }}
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "left",
+                    }}
+                  >
+                    <MenuItem
+                      onClick={(e) => {
+                        handleScore(row);
+                      }}
+                    >
+                      Print Overall
+                    </MenuItem>
+                    <MenuItem onClick={handleCloseScoreMenu}>
+                      Print Per Category
+                    </MenuItem>
+                  </Menu>
+
                   <Tooltip arrow placement="right" title="Event Settings">
                     <IconButton
                       onClick={(e) => {
@@ -396,20 +451,6 @@ const Event = () => {
                             </IconButton>
                           </Tooltip>
 
-                          <Tooltip arrow placement="right" title="Score">
-                            <IconButton
-                              color="warning"
-                              onClick={(e) => {
-                                handleScore(row);
-                              }}
-                            >
-                              <FontAwesomeIcon
-                                icon={faSquarePollVertical}
-                                size="xs"
-                              />
-                            </IconButton>
-                          </Tooltip>
-
                           <Tooltip
                             arrow
                             placement="right"
@@ -449,6 +490,7 @@ const Event = () => {
             />
           </Box>
         </Paper>
+
         <AddEditEventDialog
           openEvent={openEvent}
           handleCloseEvent={handleClose}
