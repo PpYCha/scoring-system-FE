@@ -144,7 +144,7 @@ const Event = () => {
     }
   };
 
-  const handleScore = async (e) => {
+  const handleScore = (e) => {
     try {
       dispatch({ type: actions.START_LOADING });
       dispatch({

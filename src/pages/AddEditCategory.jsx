@@ -44,6 +44,7 @@ import {
   faScaleUnbalancedFlip,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import OverallReport from "./score/toPrint/OverallReport";
 
 const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
   const [startDate, setStartDate] = useState(dayjs());
@@ -64,7 +65,7 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
 
   const fetch = async () => {
     const res = await indexCategories();
-    console.log(category);
+
     const filteredList = res.filter(
       (item) =>
         item.event_id === category.event_id &&

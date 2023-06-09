@@ -36,6 +36,7 @@ import actionHelper from "../../context/actionHelper";
 import HeaderReport from "./toPrint/HeaderReport";
 import FooterReport from "./toPrint/FooterReport";
 import { indexContestantsEvents } from "../../api/contestantEventController";
+import OverallReport from "./toPrint/OverallReport";
 
 const AddEditScore = ({ openEvent, handleCloseEvent }) => {
   const [categories, setCategories] = useState([{}]);
@@ -103,7 +104,6 @@ const AddEditScore = ({ openEvent, handleCloseEvent }) => {
       (item) => item.subEvent_id === contestant.subEvent_id
     );
 
-    console.log(filteredCategories);
     setContestants(combinedData);
     setCategories(filteredCategories);
   };
@@ -117,100 +117,11 @@ const AddEditScore = ({ openEvent, handleCloseEvent }) => {
       {loading ? null : (
         <Dialog open={openEvent} fullScreen>
           <DialogContent>
-            <TableContainer
-              component={Paper}
-              ref={tableRef}
-              sx={{
-                width: "190mm", // Adjusted width to account for margins
-                // width: "277mm", // Adjusted width to account for margins
-                // height: "190mm", // Adjusted height to account for margins
-                // border: "1px solid black",
-                margin: "10mm", // Margins of 10mm on all sides
-              }}
-            >
-              <HeaderReport />
-
-              <Table
-                sx={{
-                  tableLayout: "fixed",
-                }}
-                size="small"
-                aria-label="a dense table"
-              >
-                <TableHead sx={{ backgroundColor: "gray", color: "white" }}>
-                  <TableRow>
-                    <TableCell sx={{ width: 125, fontSize: 12 }}>
-                      Contestant
-                    </TableCell>
-                    {categories.map((item) => (
-                      <TableCell
-                        key={item.category}
-                        align="left"
-                        sx={{ fontSize: 12 }}
-                      >
-                        {item.category}({item.percentage}%)
-                      </TableCell>
-                    ))}
-                    <TableCell>Total</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {contestants.map((item) => {
-                    const totalScores = [];
-
-                    return (
-                      <TableRow key={item.id}>
-                        <TableCell align="left">{item.municipality}</TableCell>
-                        {categories.map((category) => {
-                          const contestantCategory =
-                            item.categories &&
-                            item.categories.find(
-                              (cat) => cat.category_id === category.id
-                            );
-                          const totalScore = contestantCategory
-                            ? contestantCategory.totalScore
-                            : null;
-
-                          if (contestantCategory && totalScore !== null) {
-                            const categoryPercentage = category.percentage || 0;
-                            const totalWeight = categoryPercentage / 100;
-                            const calculatedScore = totalScore * totalWeight;
-                            totalScores.push(calculatedScore);
-                            return (
-                              <TableCell
-                                key={category.id}
-                                align="left"
-                                sx={{ fontSize: 10 }}
-                              >
-                                {totalScore}
-                              </TableCell>
-                            );
-                          } else {
-                            return (
-                              <TableCell
-                                key={category.id}
-                                align="left"
-                                sx={{ fontSize: 10 }}
-                              >
-                                <span style={{ color: "red" }}>N/A</span>
-                              </TableCell>
-                            );
-                          }
-                        })}
-                        <TableCell>
-                          {totalScores.length > 0 ? (
-                            totalScores.reduce((a, b) => a + b).toFixed(2)
-                          ) : (
-                            <span style={{ color: "red" }}>N/A</span>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-              <FooterReport />
-            </TableContainer>
+            <OverallReport
+              tableRef={tableRef}
+              categories={categories}
+              contestants={contestants}
+            />
 
             <DialogActions>
               <Button onClick={handlePrint} variant="contained">

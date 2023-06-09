@@ -1,4 +1,5 @@
 import axios from "axios";
+import { array } from "yup";
 
 const apiUrl = process.env.REACT_APP_API;
 
@@ -14,6 +15,7 @@ export const indexScores = async () => {
 };
 
 // Store a newly created user in storage.
+
 export const storeScore = async (value) => {
   try {
     const res = await axios.post(`${apiUrl}scores`, {
@@ -22,6 +24,7 @@ export const storeScore = async (value) => {
       judge_id: value.judge_id,
       criteria_id: value.criteria_id,
       event_id: value.event_id,
+      subEvent_id: value.subEvent_id,
     });
 
     return res;
