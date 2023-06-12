@@ -38,7 +38,9 @@ import { indexCategories } from "../../api/categoryController";
 
 const AddEditSettingsEventDialog = ({ openEvent, handleCloseEvent }) => {
   const [startDate, setStartDate] = useState(dayjs());
-  const [categoriesList, setCategoriesList] = useState([{}]);
+  const [categoriesList, setCategoriesList] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [categoryPercentages, setCategoryPercentages] = useState({});
 
   const {
     state: { loading, event },
@@ -54,189 +56,173 @@ const AddEditSettingsEventDialog = ({ openEvent, handleCloseEvent }) => {
   const fetch = async () => {
     const res = await indexCategories();
     console.log(res);
-    setCategoriesList(res);
+    setCategoriesList(
+      res.map((category) => ({ ...category, id: category.id }))
+    );
   };
 
-  const handleSubmit = async (values) => {
-    dispatch({ type: action.START_LOADING });
-    try {
-      if (typeof values.id === "undefined") {
-        handleSave(values);
-      }
-      if (values.id) {
-        handleUpdate(values);
-      }
-    } catch (error) {
-      throw error;
-    }
-    dispatch({ type: action.END_LOADING });
-  };
-
-  const handleSave = async (values) => {
-    try {
-      const dateFormatted = formatDatePicker(startDate.$d);
-      let inputs = values;
-      inputs.date = dateFormatted;
-
-      const res = await storeEvent(inputs);
-      Swal.fire({
-        icon: "success",
-        title: res.data.message,
-        showConfirmButton: false,
-        timer: 2000,
-      });
-      handleCloseEvent();
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: JSON.stringify(error.errors),
-      });
-    }
-  };
-
-  const handleUpdate = async (values) => {
+  const handleSubmit = (values) => {
     console.log(values);
-    dispatch({ type: action.RESET_EVENT });
+    console.log("Selected Categories:", values.selectedCategories);
+    console.log("Category Percentages:", values.categoryPercentages);
   };
 
-  const textInput = [
-    {
-      name: "title",
-      label: "Title",
-      md: 12,
-    },
-    // {
-    //   name: "description",
-    //   label: "Description",
-    //   md: 12,
-    // },
-  ];
+  const handleSwitchToggle = (item) => {
+    setSelectedCategories((prevCategories) => {
+      if (prevCategories.includes(item)) {
+        return prevCategories.filter((category) => category !== item);
+      } else {
+        return [...prevCategories, item];
+      }
+    });
+  };
 
-  const validationSchema = Yup.object({
-    title: Yup.string().required("Please enter event title"),
-  });
+  const handlePercentageChange = (event, item) => {
+    const { id, value } = event.target;
+    setCategoryPercentages((prevPercentages) => ({
+      ...prevPercentages,
+      [item.id]: value,
+    }));
+  };
 
   return (
     <Dialog open={openEvent} fullWidth={true} maxWidth="md">
       <DialogTitle variant="h5">Settings</DialogTitle>
       <DialogContent>
         <Formik
-          initialValues={{ ...event }}
-          validationSchema={validationSchema}
+          initialValues={{
+            selectedCategories: selectedCategories,
+            categoryPercentages: categoryPercentages,
+          }}
           onSubmit={handleSubmit}
         >
-          <Form>
-            <Card>
-              <CardContent>
-                <Typography variant="h6">Sidebar Navigation Active</Typography>
-                <Typography variant="body2" gutterBottom>
-                  Sidebar navigation view judge
-                </Typography>
-                <Box flex>
-                  <FormControl>
-                    <FormLabel id="demo-radio-buttons-group-label">
-                      Sub Event
-                    </FormLabel>
-                    <RadioGroup
-                      aria-labelledby="demo-radio-buttons-group-label"
-                      defaultValue="female"
-                      name="radio-buttons-group"
-                    >
-                      <FormControlLabel
-                        value="female"
-                        control={<Radio />}
-                        label="Talent Night"
-                      />
-                      <FormControlLabel
-                        value="male"
-                        control={<Radio />}
-                        label="Pre-Pageant"
-                      />
-                      <FormControlLabel
-                        value="other"
-                        control={<Radio />}
-                        label="Main Event"
-                      />
-                      <FormControlLabel
-                        value="others"
-                        control={<Radio />}
-                        label="Final Seven"
-                      />
-                    </RadioGroup>
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel id="demo-radio-buttons-group-label">
-                      Category
-                    </FormLabel>
-                    <RadioGroup
-                      aria-labelledby="demo-radio-buttons-group-label"
-                      defaultValue="female"
-                      name="radio-buttons-group"
-                    >
-                      <FormControlLabel
-                        value="female"
-                        control={<Radio />}
-                        label="Talent Night"
-                      />
-                      <FormControlLabel
-                        value="male"
-                        control={<Radio />}
-                        label="Pre-Pageant"
-                      />
-                      <FormControlLabel
-                        value="other"
-                        control={<Radio />}
-                        label="Main Event"
-                      />
-                      <FormControlLabel
-                        value="others"
-                        control={<Radio />}
-                        label="Final Seven"
-                      />
-                    </RadioGroup>
-                  </FormControl>
-                </Box>
-              </CardContent>
-            </Card>
+          {({ handleSubmit }) => (
+            <Form onSubmit={handleSubmit}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6">
+                    Sidebar Navigation Active
+                  </Typography>
+                  <Typography variant="body2" gutterBottom>
+                    Sidebar navigation view judge
+                  </Typography>
+                  {/* <Box flex>
+                    <FormControl>
+                      <FormLabel id="demo-radioasdf-buttons-group-label">
+                        Sub Event
+                      </FormLabel>
+                      <RadioGroup
+                        aria-labelledby="demo-radio-buttons-group-label"
+                        defaultValue="female"
+                        name="radio-buttons-group"
+                      >
+                        <FormControlLabel
+                          value="female"
+                          control={<Radio />}
+                          label="Talent Night"
+                        />
+                        <FormControlLabel
+                          value="male"
+                          control={<Radio />}
+                          label="Pre-Pageant"
+                        />
+                        <FormControlLabel
+                          value="other"
+                          control={<Radio />}
+                          label="Main Event"
+                        />
+                        <FormControlLabel
+                          value="others"
+                          control={<Radio />}
+                          label="Final Seven"
+                        />
+                      </RadioGroup>
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel id="demo-radiadffo-buttfons-group-label">
+                        Category
+                      </FormLabel>
+                      <RadioGroup
+                        aria-labelledby="demo-radio-buttons-group-label"
+                        defaultValue="female"
+                        name="radio-buttons-group"
+                      >
+                        <FormControlLabel
+                          value="female"
+                          control={<Radio />}
+                          label="Talent Night"
+                        />
+                        <FormControlLabel
+                          value="male"
+                          control={<Radio />}
+                          label="Pre-Pageant"
+                        />
+                        <FormControlLabel
+                          value="other"
+                          control={<Radio />}
+                          label="Main Event"
+                        />
+                        <FormControlLabel
+                          value="others"
+                          control={<Radio />}
+                          label="Final Seven"
+                        />
+                      </RadioGroup>
+                    </FormControl>
+                  </Box> */}
+                </CardContent>
+              </Card>
 
-            <Card>
-              <CardContent>
-                <Typography variant="h6">List of Events</Typography>
-                <Typography variant="body2" gutterBottom>
-                  To be included in final computation
-                </Typography>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6">List of Events</Typography>
+                  <Typography variant="body2" gutterBottom>
+                    To be included in final computation
+                  </Typography>
 
-                {categoriesList.map((item) => (
-                  <Stack
-                    key={item.id} // Add a unique key prop for each item in the array
-                    spacing={2}
-                    mb={2}
-                    direction="row"
-                    justifyContent="space-between"
-                  >
-                    <FormControlLabel
-                      value="end"
-                      control={<Switch color="primary" />}
-                      label={item.category}
-                      labelPlacement="start"
-                    />
-                    <TextField
-                      id={item.title}
-                      label="Percentage"
-                      variant="outlined"
-                      size="small"
-                    />
-                  </Stack>
-                ))}
-              </CardContent>
-            </Card>
+                  {categoriesList.map(
+                    (item) =>
+                      item && (
+                        <Stack
+                          key={item.id}
+                          spacing={2}
+                          mb={2}
+                          direction="row"
+                          justifyContent="space-between"
+                        >
+                          <FormControlLabel
+                            control={
+                              <Switch
+                                color="primary"
+                                checked={selectedCategories.includes(item)}
+                                onChange={() => handleSwitchToggle(item)}
+                              />
+                            }
+                            label={item.category}
+                            labelPlacement="start"
+                          />
+                          {selectedCategories.includes(item) && (
+                            <TextField
+                              name={`categoryPercentages.${item.id}`}
+                              label="Percentage"
+                              variant="outlined"
+                              size="small"
+                              value={categoryPercentages[item.id] || ""}
+                              onChange={handlePercentageChange}
+                            />
+                          )}
+                        </Stack>
+                      )
+                  )}
+                </CardContent>
+              </Card>
 
-            <DialogActions>
-              <ButtonSave />
-              <ButtonCancel handleClose={handleCloseEvent} />
-            </DialogActions>
-          </Form>
+              <DialogActions>
+                <ButtonSave />
+                <ButtonCancel handleClose={handleCloseEvent} />
+              </DialogActions>
+            </Form>
+          )}
         </Formik>
       </DialogContent>
     </Dialog>
