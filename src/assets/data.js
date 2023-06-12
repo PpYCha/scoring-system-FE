@@ -34,3 +34,16 @@ export const tabulator = [
   //   name: "Diasan A. Diaz Jr.",
   // },
 ];
+
+export const scores = [
+  {
+    id: 1,
+    score: 10,
+    contestant_id: 23,
+    judge_id: 1,
+    criteria_id: "",
+    event_id: 12,
+    subEvent_id: 53,
+    category_id: 17,
+  },
+];

@@ -162,6 +162,24 @@ const Event = () => {
     }
   };
 
+  const handleScorePerSubEvent = (e) => {
+    try {
+      dispatch({ type: actions.START_LOADING });
+      dispatch({
+        type: actions.UPDATE_CONTESTANT,
+        payload: {
+          event_id: e.original.id,
+          // subEvent_id: e.original.id,
+        },
+      });
+
+      dispatch({ type: actions.END_LOADING });
+      setOpenScore(true);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleDelete = async (e) => {
     console.log(e);
     try {
@@ -450,7 +468,19 @@ const Event = () => {
                               <FontAwesomeIcon icon={faPenToSquare} size="xs" />
                             </IconButton>
                           </Tooltip>
-
+                          <Tooltip arrow placement="right" title="Score">
+                            <IconButton
+                              color="warning"
+                              onClick={(e) => {
+                                handleScorePerSubEvent(row, item);
+                              }}
+                            >
+                              <FontAwesomeIcon
+                                icon={faSquarePollVertical}
+                                size="xs"
+                              />
+                            </IconButton>
+                          </Tooltip>
                           <Tooltip
                             arrow
                             placement="right"

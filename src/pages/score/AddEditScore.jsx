@@ -33,8 +33,7 @@ import { indexScores } from "../../api/scoreController";
 import { useReactToPrint } from "react-to-print";
 import { useValue } from "../../context/ContextProvider";
 import actionHelper from "../../context/actionHelper";
-import HeaderReport from "./toPrint/HeaderReport";
-import FooterReport from "./toPrint/FooterReport";
+
 import { indexContestantsEvents } from "../../api/contestantEventController";
 import OverallReport from "./toPrint/OverallReport";
 
@@ -42,6 +41,7 @@ const AddEditScore = ({ openEvent, handleCloseEvent }) => {
   const [categories, setCategories] = useState([{}]);
   const [contestants, setContestants] = useState([{}]);
   const [scores, setScores] = useState([{}]);
+  const [open, setOpen] = useState(false);
 
   const tableRef = useRef();
 
@@ -54,7 +54,7 @@ const AddEditScore = ({ openEvent, handleCloseEvent }) => {
 
   useEffect(() => {
     fetch();
-  }, []);
+  }, [openEvent]);
 
   const fetch = async () => {
     const [resContestant, resCategories, resScore, resContestantsEvents] =
@@ -100,12 +100,14 @@ const AddEditScore = ({ openEvent, handleCloseEvent }) => {
       };
     });
 
-    const filteredCategories = resCategories.filter(
-      (item) => item.subEvent_id === contestant.subEvent_id
-    );
+    // const filteredCategories = resCategories.filter(
+    //   (item) => item.subEvent_id === contestant.subEvent_id
+    // );
 
     setContestants(combinedData);
-    setCategories(filteredCategories);
+    setCategories(resCategories);
+
+    console.log(categories);
   };
 
   const handlePrint = useReactToPrint({

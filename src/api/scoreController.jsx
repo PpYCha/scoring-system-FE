@@ -25,6 +25,7 @@ export const storeScore = async (value) => {
       criteria_id: value.criteria_id,
       event_id: value.event_id,
       subEvent_id: value.subEvent_id,
+      category_id: value.category_id,
     });
 
     return res;

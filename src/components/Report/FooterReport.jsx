@@ -1,6 +1,6 @@
 import { Box, Grid, Stack, Typography } from "@mui/material";
 import React from "react";
-import { judges, tabulator } from "../../../assets/data";
+import { judges, tabulator } from "../../assets/data";
 
 const FooterReport = () => {
   return (

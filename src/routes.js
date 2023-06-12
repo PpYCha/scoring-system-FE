@@ -23,9 +23,9 @@ const Router = () => {
         <Route
           path="/dashboard"
           element={
-            <RequireAuth>
-              <DashboardLayout />
-            </RequireAuth>
+            // <RequireAuth>
+            <DashboardLayout />
+            // </RequireAuth>
           }
         >
           <Route index element={<Dashboard />} />

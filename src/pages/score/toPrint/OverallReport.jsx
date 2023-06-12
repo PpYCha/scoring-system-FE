@@ -7,50 +7,34 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import React from "react";
-import FooterReport from "./FooterReport";
-import HeaderReport from "./HeaderReport";
+import React, { useState } from "react";
+import FooterReport from "../../../components/Report/FooterReport";
+
+import HeaderReport from "../../../components/Report/HeaderReport";
 
 const OverallReport = ({ tableRef, categories, contestants }) => {
-  console.log(categories);
-  console.log(contestants);
+  const [score, setScore] = useState([{}]);
 
-  const columnHeader = [
-    {
-      id: 2,
-      cheader: "PRE-PAGEANT 30%",
-      width: 150,
-    },
-    {
-      id: 3,
-      cheader: "SWIMSUIT 35%",
-      width: 125,
-    },
-    {
-      id: 4,
-      cheader: "EVENING GOWN 35%",
-      width: 160,
-    },
-    {
-      id: 5,
-      cheader: "TOTAL",
-    },
-    {
-      id: 6,
-      cheader: "RANK",
-    },
-  ];
+  const calculateTotalScore = (item, category) => {
+    const contestantCategory = item.categories?.find(
+      (cat) => cat.category_id === category.id
+    );
+    const totalScore = contestantCategory?.totalScore;
+    const categoryPercentage = category.percentage || 0;
+    console.log(category.percentage);
+    const totalWeight = categoryPercentage / 100;
+    const calculatedScore = totalScore ? totalScore * totalWeight : null;
+    return calculatedScore;
+  };
 
   return (
     <TableContainer
       component={Paper}
       ref={tableRef}
       sx={{
-        width: "190mm", // Adjusted width to account for margins
-        // width: "277mm", // Adjusted width to account for margins
-        // height: "190mm", // Adjusted height to account for margins
-        // border: "1px solid black",
+        width: "277mm", // Adjusted width to account for margins
         margin: "10mm", // Margins of 10mm on all sides
+        // height: "190mm", // Adjusted height to account for margins
       }}
     >
       <HeaderReport />
@@ -64,14 +48,14 @@ const OverallReport = ({ tableRef, categories, contestants }) => {
       >
         <TableHead sx={{ backgroundColor: "gray", color: "white" }}>
           <TableRow>
-            <TableCell sx={{ width: 125, fontSize: 12 }}>CANDIDATE</TableCell>
-            {columnHeader.map((item) => (
+            <TableCell sx={{ width: 215, fontSize: 12 }}>CANDIDATE</TableCell>
+            {categories.map((item) => (
               <TableCell
                 key={item.id}
                 align="left"
                 sx={{ fontSize: 12, width: item.width }}
               >
-                {item.cheader}
+                {item.category}
               </TableCell>
             ))}
           </TableRow>
@@ -82,42 +66,26 @@ const OverallReport = ({ tableRef, categories, contestants }) => {
 
             return (
               <TableRow key={item.id}>
-                <TableCell align="left">{item.municipality}</TableCell>
+                <TableCell align="left">
+                  Mutya san {item.municipality.toUpperCase()}
+                </TableCell>
                 {categories.map((category) => {
-                  const contestantCategory =
-                    item.categories &&
-                    item.categories.find(
-                      (cat) => cat.category_id === category.id
-                    );
-                  const totalScore = contestantCategory
-                    ? contestantCategory.totalScore
-                    : null;
+                  const calculatedScore = calculateTotalScore(item, category);
+                  totalScores.push(calculatedScore);
 
-                  if (contestantCategory && totalScore !== null) {
-                    const categoryPercentage = category.percentage || 0;
-                    const totalWeight = categoryPercentage / 100;
-                    const calculatedScore = totalScore * totalWeight;
-                    totalScores.push(calculatedScore);
-                    return (
-                      <TableCell
-                        key={category.id}
-                        align="left"
-                        sx={{ fontSize: 10 }}
-                      >
-                        {totalScore}
-                      </TableCell>
-                    );
-                  } else {
-                    return (
-                      <TableCell
-                        key={category.id}
-                        align="left"
-                        sx={{ fontSize: 10 }}
-                      >
+                  return (
+                    <TableCell
+                      key={category.id}
+                      align="left"
+                      sx={{ fontSize: 10 }}
+                    >
+                      {calculatedScore !== null ? (
+                        calculatedScore.toFixed(2)
+                      ) : (
                         <span style={{ color: "red" }}>N/A</span>
-                      </TableCell>
-                    );
-                  }
+                      )}
+                    </TableCell>
+                  );
                 })}
                 <TableCell>
                   {totalScores.length > 0 ? (
