@@ -8,9 +8,9 @@ import {
   TableRow,
 } from "@mui/material";
 import React, { useState } from "react";
-import FooterReport from "../../../components/Report/FooterReport";
+import FooterReport from "./FooterReport";
 
-import HeaderReport from "../../../components/Report/HeaderReport";
+import HeaderReport from "./HeaderReport";
 
 const OverallReport = ({ tableRef, categories, contestants }) => {
   const [score, setScore] = useState([{}]);
@@ -21,7 +21,7 @@ const OverallReport = ({ tableRef, categories, contestants }) => {
     );
     const totalScore = contestantCategory?.totalScore;
     const categoryPercentage = category.percentage || 0;
-    console.log(category.percentage);
+
     const totalWeight = categoryPercentage / 100;
     const calculatedScore = totalScore ? totalScore * totalWeight : null;
     return calculatedScore;

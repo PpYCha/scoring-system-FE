@@ -23,7 +23,7 @@ import { useValue } from "../../context/ContextProvider";
 import actionHelper from "../../context/actionHelper";
 import Swal from "sweetalert2";
 import AddEditContestant from "../contestant/AddEditContestant";
-import AddEditScore from "../score/AddEditScore";
+import OverallScoreDialog from "../score/OverallScoreDialog";
 import { navigateContestants } from "../../utils/navigateUrl";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -41,6 +41,7 @@ import {
 import AddEditSubEventDialog from "./AddEditSubEventDialog";
 import { deleteSubEvent, indexSubEvents } from "../../api/subEventController";
 import AddEditSettingsEventDialog from "./AddEditSettingsEventDialog";
+import PerSubEventScoreDialog from "../score/PerSubEventScoreDialog";
 
 const Event = () => {
   const [tableList, setTableList] = useState([{}]);
@@ -51,6 +52,7 @@ const Event = () => {
   const [openContestants, setOpenContestants] = useState(false);
   const [openScore, setOpenScore] = useState(false);
   const [openSettingsEvent, setOpenSettingsEvent] = useState(false);
+  const [openSubEventScore, setOpenSubEventScore] = useState(false);
 
   const [anchorEl, setAnchorEl] = useState(null);
   const openScoreMenu = Boolean(anchorEl);
@@ -162,19 +164,19 @@ const Event = () => {
     }
   };
 
-  const handleScorePerSubEvent = (e) => {
+  const handleScorePerSubEvent = (row, item) => {
     try {
       dispatch({ type: actions.START_LOADING });
       dispatch({
         type: actions.UPDATE_CONTESTANT,
         payload: {
-          event_id: e.original.id,
-          // subEvent_id: e.original.id,
+          event_id: item.event_id,
+          subEvent_id: item.id,
         },
       });
 
       dispatch({ type: actions.END_LOADING });
-      setOpenScore(true);
+      setOpenSubEventScore(true);
     } catch (error) {
       console.log(error);
     }
@@ -259,7 +261,7 @@ const Event = () => {
     setOpenScore(false);
     setOpenSubEvent(false);
     setOpenSettingsEvent(false);
-
+    setOpenSubEventScore(false);
     dispatch({ type: actions.RESET_EVENT });
     dispatch({ type: actions.RESET_SUBEVENT });
     fetch();
@@ -533,7 +535,14 @@ const Event = () => {
           openEvent={openContestants}
           handleCloseEvent={handleClose}
         />
-        <AddEditScore openEvent={openScore} handleCloseEvent={handleClose} />
+        <OverallScoreDialog
+          openEvent={openScore}
+          handleCloseEvent={handleClose}
+        />
+        <PerSubEventScoreDialog
+          openEvent={openSubEventScore}
+          handleCloseEvent={handleClose}
+        />
         <AddEditSubEventDialog
           openEvent={openSubEvent}
           handleCloseEvent={handleClose}

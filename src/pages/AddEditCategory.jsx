@@ -44,7 +44,7 @@ import {
   faScaleUnbalancedFlip,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import OverallReport from "./score/toPrint/OverallReport";
+import OverallReport from "../components/Report/OverallReport";
 
 const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
   const [startDate, setStartDate] = useState(dayjs());

@@ -13,6 +13,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Typography,
 } from "@mui/material";
 import { Form, Formik } from "formik";
 import React, { useEffect, useRef, useState } from "react";
@@ -35,14 +36,14 @@ import { useValue } from "../../context/ContextProvider";
 import actionHelper from "../../context/actionHelper";
 
 import { indexContestantsEvents } from "../../api/contestantEventController";
-import OverallReport from "./toPrint/OverallReport";
+import OverallReport from "../../components/Report/OverallReport";
+import PerSubEventReport from "../../components/Report/PerSubEventReport";
 
-const AddEditScore = ({ openEvent, handleCloseEvent }) => {
+const PerSubEventScoreDialog = ({ openEvent, handleCloseEvent }) => {
   const [categories, setCategories] = useState([{}]);
   const [contestants, setContestants] = useState([{}]);
   const [scores, setScores] = useState([{}]);
   const [open, setOpen] = useState(false);
-
   const tableRef = useRef();
 
   const {
@@ -100,14 +101,12 @@ const AddEditScore = ({ openEvent, handleCloseEvent }) => {
       };
     });
 
-    // const filteredCategories = resCategories.filter(
-    //   (item) => item.subEvent_id === contestant.subEvent_id
-    // );
+    const filteredCategories = resCategories.filter(
+      (item) => item.subEvent_id === contestant.subEvent_id
+    );
 
     setContestants(combinedData);
-    setCategories(resCategories);
-
-    console.log(categories);
+    setCategories(filteredCategories);
   };
 
   const handlePrint = useReactToPrint({
@@ -119,10 +118,29 @@ const AddEditScore = ({ openEvent, handleCloseEvent }) => {
       {loading ? null : (
         <Dialog open={openEvent} fullScreen>
           <DialogContent>
-            <OverallReport
+            <PerSubEventReport
               tableRef={tableRef}
-              categories={categories}
+              columnHeaderCategories={categories}
               contestants={contestants}
+              textHeader={
+                <>
+                  {/* <Typography variant="subtitle1" mb={-1}>
+                    Republic of the Philippines
+                  </Typography>
+                  <Typography variant="subtitle1" mb={-1}>
+                    Province of Northern Samar
+                  </Typography>
+                  <Typography variant="subtitle1" mb={-1}>
+                    Provincial Tourism Office
+                  </Typography>
+                  <Typography variant="h6" mb={-1}>
+                    Mutya san Ibabao 2023
+                  </Typography> */}
+                  <Typography variant="h6" mb={-1}>
+                    Talent Competition Score
+                  </Typography>
+                </>
+              }
             />
 
             <DialogActions>
@@ -138,4 +156,4 @@ const AddEditScore = ({ openEvent, handleCloseEvent }) => {
   );
 };
 
-export default AddEditScore;
+export default PerSubEventScoreDialog;

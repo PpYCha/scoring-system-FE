@@ -1,9 +1,9 @@
 import { Box, Stack, Typography } from "@mui/material";
 import React from "react";
-import mutyaLogo2023 from "../../assets/logo/mutyaLogo2023.jpg";
+import mutyaLogo2023 from "../../assets/logo/mutyaLogo2023-removebg-preview.png";
 import ibabaoFestivalLogo from "../../assets/logo/ibabaoFestivalLogo.jpg";
 
-const HeaderReport = () => {
+const HeaderReport = ({ textHeader }) => {
   return (
     <Stack
       direction="row"
@@ -12,7 +12,7 @@ const HeaderReport = () => {
       spacing={2}
       mb={1}
     >
-      <img src={mutyaLogo2023} alt="mutya" width="150" height="150" />
+      <img src={mutyaLogo2023} alt="mutya" width="100" height="100" />
 
       <Box sx={{ textAlign: "center" }}>
         {/* <Typography variant="subtitle1" mb={-1}>
@@ -23,15 +23,16 @@ const HeaderReport = () => {
         </Typography>
         <Typography variant="subtitle1" mb={-1}>
           Provincial Tourism Office
-        </Typography> */}
+        </Typography>
         <Typography variant="h6" mb={-1}>
           Mutya san Ibabao 2023
         </Typography>
         <Typography variant="h6" mb={-1}>
           Talent Competition Score
-        </Typography>
+        </Typography> */}
+        {textHeader}
       </Box>
-      <img src={ibabaoFestivalLogo} alt="mutya" width="150" height="150" />
+      <img src={ibabaoFestivalLogo} alt="mutya" width="100" height="100" />
     </Stack>
   );
 };
