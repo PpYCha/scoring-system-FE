@@ -17,9 +17,12 @@ export const indexCriterias = async () => {
 export const storeCriteria = async (value) => {
   try {
     const res = await axios.post(`${apiUrl}criterias`, {
+      criteriaName: value.criteriaName,
       description: value.description,
       percentage: value.percentage,
       category_id: value.category_id,
+      minimumPercentage: value.minimumPercentage,
+      maximumPercentage: value.maximumPercentage,
     });
 
     return res;

@@ -46,6 +46,42 @@ const JudgeLayout = () => {
           subEvent_id: sub_id,
           category_id: cat_id,
         });
+        const res2 = await storeScore({
+          score: score.toFixed(1),
+          contestant_id: i,
+          judge_id: 7,
+          criteria_id: "",
+          event_id: ev_id,
+          subEvent_id: sub_id,
+          category_id: cat_id,
+        });
+        const res3 = await storeScore({
+          score: score.toFixed(1),
+          contestant_id: i,
+          judge_id: 8,
+          criteria_id: "",
+          event_id: ev_id,
+          subEvent_id: sub_id,
+          category_id: cat_id,
+        });
+        const res4 = await storeScore({
+          score: score.toFixed(1),
+          contestant_id: i,
+          judge_id: 9,
+          criteria_id: "",
+          event_id: ev_id,
+          subEvent_id: sub_id,
+          category_id: cat_id,
+        });
+        const res5 = await storeScore({
+          score: score.toFixed(1),
+          contestant_id: i,
+          judge_id: 10,
+          criteria_id: "",
+          event_id: ev_id,
+          subEvent_id: sub_id,
+          category_id: cat_id,
+        });
 
         // Handle the response if needed
         console.log(res);

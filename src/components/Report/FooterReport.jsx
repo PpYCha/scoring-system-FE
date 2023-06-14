@@ -11,9 +11,7 @@ const FooterReport = () => {
         alignItems="flex-start"
         spacing={1}
       >
-        <Typography sx={{ fontWeight: "bold", ontSize: 12 }}>
-          Judges:
-        </Typography>
+        <Typography sx={{ fontWeight: "bold", ontSize: 12 }}>Judge:</Typography>
         <Grid container>
           {judges.map((item, index) => (
             <Grid item mb={2} key={item.id} md={3}>

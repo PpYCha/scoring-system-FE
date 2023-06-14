@@ -172,6 +172,16 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
       label: "Percentage",
       md: 6,
     },
+    // {
+    //   name: "minimumPercentage",
+    //   label: "Minimum Score Percentage",
+    //   md: 6,
+    // },
+    // {
+    //   name: "maximumPercentage",
+    //   label: "Maximum Score Percentage",
+    //   md: 6,
+    // },
   ];
 
   const columns = useMemo(() => {
@@ -218,6 +228,14 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
           </Stack>
         ),
       },
+      // {
+      //   accessorKey: "minimumPercentage",
+      //   header: "Minimum Score Percentage",
+      // },
+      // {
+      //   accessorKey: "maximumPercentage",
+      //   header: "Maximum Score Percentage",
+      // },
     ];
   }, [tableList]);
 

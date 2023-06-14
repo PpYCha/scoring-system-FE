@@ -348,7 +348,6 @@ const Event = () => {
                       <FontAwesomeIcon icon={faPenToSquare} size="xs" />
                     </IconButton>
                   </Tooltip>
-
                   <Tooltip arrow placement="right" title="Contestants">
                     <IconButton
                       // color="success"
@@ -359,48 +358,6 @@ const Event = () => {
                       <FontAwesomeIcon icon={faChessQueen} size="xs" />
                     </IconButton>
                   </Tooltip>
-                  <Tooltip arrow placement="right" title="Score">
-                    <IconButton
-                      color="warning"
-                      // onClick={(e) => {
-                      //   handleScore(row, item);
-                      // }}
-                      aria-controls={
-                        openScoreMenu ? "demo-positioned-menu" : undefined
-                      }
-                      aria-haspopup="true"
-                      aria-expanded={openScoreMenu ? "true" : undefined}
-                      onClick={handleClickOpenScoreMenu}
-                    >
-                      <FontAwesomeIcon icon={faSquarePollVertical} size="xs" />
-                    </IconButton>
-                  </Tooltip>
-                  <Menu
-                    id="demo-positioned-menu"
-                    aria-labelledby="demo-positioned-button"
-                    anchorEl={anchorEl}
-                    open={openScoreMenu}
-                    onClose={handleCloseScoreMenu}
-                    anchorOrigin={{
-                      vertical: "top",
-                      horizontal: "left",
-                    }}
-                    transformOrigin={{
-                      vertical: "top",
-                      horizontal: "left",
-                    }}
-                  >
-                    <MenuItem
-                      onClick={(e) => {
-                        handleScore(row);
-                      }}
-                    >
-                      Print Overall
-                    </MenuItem>
-                    <MenuItem onClick={handleCloseScoreMenu}>
-                      Print Per Category
-                    </MenuItem>
-                  </Menu>
 
                   <Tooltip arrow placement="right" title="Event Settings">
                     <IconButton

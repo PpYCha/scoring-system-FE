@@ -22,6 +22,8 @@ export const storeCategory = async (value) => {
       percentage: value.percentage,
       event_id: value.event_id,
       subEvent_id: value.subEvent_id,
+      minimumPercentage: value.minimumPercentage,
+      maximumPercentage: value.maximumPercentage,
     });
 
     return res;

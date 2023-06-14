@@ -7,16 +7,16 @@ export const judges = [
 export const tabulator = [
   {
     id: 1,
-    name: "Diasan A. Diaz Jr.",
+    name: "MR. JONAS GALIT",
   },
-  {
-    id: 2,
-    name: "Alex Olesco",
-  },
-  {
-    id: 3,
-    name: "Seymour Turla",
-  },
+  // {
+  //   id: 2,
+  //   name: "Alex Olesco",
+  // },
+  // {
+  //   id: 3,
+  //   name: "Seymour Turla",
+  // },
   // {
   //   id: 4,
   //   name: "Tolin Montera",

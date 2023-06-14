@@ -112,15 +112,30 @@ const AddEditCriteria = ({ openEvent, handleCloseEvent }) => {
 
   const textInput = [
     {
-      name: "description",
+      name: "criteriaName",
       label: "Criteria",
+      md: 12,
+    },
+    {
+      name: "description",
+      label: "Description",
       md: 12,
     },
     {
       name: "percentage",
       label: "Percentage",
-      md: 12,
+      md: 6,
     },
+    {
+      name: "minimumPercentage",
+      label: "Minimum Score Percentage",
+      md: 6,
+    },
+    // {
+    //   name: "maximumPercentage",
+    //   label: "Maximum Score Percentage",
+    //   md: 6,
+    // },
   ];
 
   const columns = useMemo(() => {
@@ -135,8 +150,16 @@ const AddEditCriteria = ({ openEvent, handleCloseEvent }) => {
         header: "ID",
       },
       {
-        accessorKey: "description",
+        accessorKey: "criteriaName",
         header: "Criteria",
+      },
+      {
+        accessorKey: "description",
+        header: "Description",
+      },
+      {
+        accessorKey: "minimumPercentage",
+        header: "Minimum Score Percentage",
       },
       {
         accessorKey: "percentage",
@@ -152,6 +175,11 @@ const AddEditCriteria = ({ openEvent, handleCloseEvent }) => {
           </Stack>
         ),
       },
+
+      // {
+      //   accessorKey: "maximumPercentage",
+      //   header: "Maximum Score Percentage",
+      // },
     ];
   }, [tableList]);
 
@@ -163,7 +191,7 @@ const AddEditCriteria = ({ openEvent, handleCloseEvent }) => {
   });
 
   return (
-    <Dialog open={openEvent} fullWidth={true} maxWidth="md">
+    <Dialog open={openEvent} fullWidth={true} maxWidth="xl">
       <DialogTitle>Criteria Details</DialogTitle>
       <DialogContent>
         <DialogContentText m={0} p={0} mb={2}>

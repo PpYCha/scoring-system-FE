@@ -55,7 +55,7 @@ const AddEditSettingsEventDialog = ({ openEvent, handleCloseEvent }) => {
 
   const fetch = async () => {
     const res = await indexCategories();
-    console.log(res);
+
     setCategoriesList(
       res.map((category) => ({ ...category, id: category.id }))
     );

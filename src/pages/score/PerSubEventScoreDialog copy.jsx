@@ -58,36 +58,48 @@ const PerSubEventScoreDialog = ({ openEvent, handleCloseEvent }) => {
   }, [openEvent]);
 
   const fetch = async () => {
-    // dispatch({ type: actions.START_LOADING });
-    const [resContestant, resCategories, resScore] = await Promise.all([
-      indexContestants(),
-      indexCategories(),
-      indexScores(),
-    ]);
+    const [resContestant, resCategories, resScore, resContestantsEvents] =
+      await Promise.all([
+        indexContestants(),
+        indexCategories(),
+        indexScores(),
+        indexContestantsEvents(),
+      ]);
 
-    const combinedData = resScore.reduce((acc, score) => {
-      const judgeId = score.judge_id;
-
-      if (!acc[judgeId]) {
-        acc[judgeId] = {
-          judge_id: judgeId,
-          contestants: [],
-        };
-      }
-
-      const contestant = resContestant.find(
-        (contestant) => contestant.id === score.contestant_id
+    const combinedData = resContestant.map((contestant) => {
+      const contestantScores = resScore.filter(
+        (score) => score.contestant_id === contestant.id
       );
 
-      if (contestant) {
-        acc[judgeId].contestants.push({
-          contestant,
+      const categoryScores = {};
+
+      contestantScores.forEach((score) => {
+        const categoryId = score.category_id;
+
+        if (!categoryScores[categoryId]) {
+          categoryScores[categoryId] = {
+            category_id: categoryId,
+            scores: [],
+            totalScore: 0,
+          };
+        }
+
+        categoryScores[categoryId].scores.push({
+          score_id: score.id,
+          judge: score.judge_id,
           score: score.score,
         });
-      }
 
-      return acc;
-    }, {});
+        categoryScores[categoryId].totalScore += parseFloat(score.score);
+      });
+
+      const categories = Object.values(categoryScores);
+
+      return {
+        ...contestant,
+        categories,
+      };
+    });
 
     const filteredCategories = resCategories.filter(
       (item) => item.subEvent_id === contestant.subEvent_id
@@ -95,9 +107,6 @@ const PerSubEventScoreDialog = ({ openEvent, handleCloseEvent }) => {
 
     setContestants(combinedData);
     setCategories(filteredCategories);
-
-    // Use the grouped and scored data as needed
-    // dispatch({ type: actions.END_LOADING });
   };
 
   const handlePrint = useReactToPrint({
