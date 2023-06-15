@@ -146,37 +146,19 @@ const Event = () => {
     }
   };
 
-  const handleScore = (e) => {
+  const handleOverallScore = (e, item) => {
     try {
       dispatch({ type: actions.START_LOADING });
       dispatch({
         type: actions.UPDATE_CONTESTANT,
         payload: {
           event_id: e.original.id,
-          // subEvent_id: e.original.id,
-        },
-      });
-
-      dispatch({ type: actions.END_LOADING });
-      setOpenScore(true);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleScorePerSubEvent = (row, item) => {
-    try {
-      dispatch({ type: actions.START_LOADING });
-      dispatch({
-        type: actions.UPDATE_CONTESTANT,
-        payload: {
-          event_id: item.event_id,
           subEvent_id: item.id,
         },
       });
 
       dispatch({ type: actions.END_LOADING });
-      setOpenSubEventScore(true);
+      setOpenScore(true);
     } catch (error) {
       console.log(error);
     }
@@ -427,11 +409,15 @@ const Event = () => {
                               <FontAwesomeIcon icon={faPenToSquare} size="xs" />
                             </IconButton>
                           </Tooltip>
-                          <Tooltip arrow placement="right" title="Score">
+                          <Tooltip
+                            arrow
+                            placement="right"
+                            title="Overall Score"
+                          >
                             <IconButton
                               color="warning"
                               onClick={(e) => {
-                                handleScorePerSubEvent(row, item);
+                                handleOverallScore(row, item);
                               }}
                             >
                               <FontAwesomeIcon
@@ -480,34 +466,48 @@ const Event = () => {
           </Box>
         </Paper>
 
-        <AddEditEventDialog
-          openEvent={openEvent}
-          handleCloseEvent={handleClose}
-        />
-        <AddEditCategory
-          openEvent={openCategory}
-          handleCloseEvent={handleClose}
-        />
-        <AddEditContestant
-          openEvent={openContestants}
-          handleCloseEvent={handleClose}
-        />
-        <OverallScoreDialog
-          openEvent={openScore}
-          handleCloseEvent={handleClose}
-        />
-        <PerSubEventScoreDialog
-          openEvent={openSubEventScore}
-          handleCloseEvent={handleClose}
-        />
-        <AddEditSubEventDialog
-          openEvent={openSubEvent}
-          handleCloseEvent={handleClose}
-        />
-        <AddEditSettingsEventDialog
-          openEvent={openSettingsEvent}
-          handleCloseEvent={handleClose}
-        />
+        {openEvent && (
+          <AddEditEventDialog
+            openEvent={openEvent}
+            handleCloseEvent={handleClose}
+          />
+        )}
+        {openCategory && (
+          <AddEditCategory
+            openEvent={openCategory}
+            handleCloseEvent={handleClose}
+          />
+        )}
+        {openContestants && (
+          <AddEditContestant
+            openEvent={openContestants}
+            handleCloseEvent={handleClose}
+          />
+        )}
+        {openScore && (
+          <OverallScoreDialog
+            openEvent={openScore}
+            handleCloseEvent={handleClose}
+          />
+        )}
+        {openSubEventScore && (
+          <PerSubEventScoreDialog
+            openEvent={openSubEventScore}
+            handleCloseEvent={handleClose}
+          />
+        )}
+        {openSubEvent && (
+          <AddEditSubEventDialog
+            openEvent={openSubEvent}
+            handleCloseEvent={handleClose}
+          />
+        )}
+        {openSettingsEvent && (
+          <AddEditSettingsEventDialog
+            openEvent={openSettingsEvent}
+            handleCloseEvent={handleClose}
+          />
+        )}
       </Box>
     </LocalizationProvider>
   );

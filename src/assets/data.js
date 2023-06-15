@@ -1,7 +1,31 @@
 export const judges = [
   {
     id: 1,
-    name: "Ricky Dula",
+    name: "JUDGE # 1: MR. PICSON",
+  },
+  {
+    id: 2,
+    name: "JUDGE # 2: PD. REGIS",
+  },
+  {
+    id: 3,
+    name: "JUDGE # 3: P/COL TADEFA",
+  },
+  {
+    id: 4,
+    name: "JUDGE # 4: PD. MAQUELABIT",
+  },
+  {
+    id: 5,
+    name: "JUDGE # 5: ATTY. AMACNA",
+  },
+  {
+    id: 6,
+    name: "JUDGE # 6: ATTY. RICKY DULA",
+  },
+  {
+    id: 7,
+    name: "JUDGE # 7: ENG. ALEX OLESCO",
   },
 ];
 export const tabulator = [
@@ -9,30 +33,18 @@ export const tabulator = [
     id: 1,
     name: "MR. JONAS GALIT",
   },
-  // {
-  //   id: 2,
-  //   name: "Alex Olesco",
-  // },
-  // {
-  //   id: 3,
-  //   name: "Seymour Turla",
-  // },
-  // {
-  //   id: 4,
-  //   name: "Tolin Montera",
-  // },
-  // {
-  //   id: 5,
-  //   name: "Ann Galit",
-  // },
-  // {
-  //   id: 6,
-  //   name: "Franklin Gonzales",
-  // },
-  // {
-  //   id: 7,
-  //   name: "Diasan A. Diaz Jr.",
-  // },
+  {
+    id: 2,
+    name: "MR. JAYSON ATICADO",
+  },
+  {
+    id: 3,
+    name: "MR. FREDEREICK GELERA",
+  },
+  {
+    id: 4,
+    name: "MR. FRANCIS DISTA",
+  },
 ];
 
 export const scores = [

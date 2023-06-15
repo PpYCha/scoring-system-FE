@@ -35,17 +35,19 @@ import { useValue } from "../../context/ContextProvider";
 import actionHelper from "../../context/actionHelper";
 
 import { indexContestantsEvents } from "../../api/contestantEventController";
-import OverallReport from "../../components/Report/OverallReport";
+import OverallReport from "./OverallReport";
 
 const OverallScoreDialog = ({ openEvent, handleCloseEvent }) => {
   const [categories, setCategories] = useState([{}]);
-  const [contestants, setContestants] = useState([{}]);
+  const [contestants, setContestants] = useState([]);
   const [scores, setScores] = useState([{}]);
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [loadReport, setLoadReport] = useState(true);
   const tableRef = useRef();
 
   const {
-    state: { loading, contestant },
+    state: { contestant },
     dispatch,
   } = useValue();
 
@@ -56,13 +58,14 @@ const OverallScoreDialog = ({ openEvent, handleCloseEvent }) => {
   }, [openEvent]);
 
   const fetch = async () => {
-    const [resContestant, resCategories, resScore, resContestantsEvents] =
-      await Promise.all([
-        indexContestants(),
-        indexCategories(),
-        indexScores(),
-        indexContestantsEvents(),
-      ]);
+    // dispatch({ type: actions.START_LOADING });
+    setLoading(true);
+
+    const [resContestant, resCategories, resScore] = await Promise.all([
+      indexContestants(),
+      indexCategories(),
+      indexScores(),
+    ]);
 
     const combinedData = resContestant.map((contestant) => {
       const contestantScores = resScore.filter(
@@ -105,6 +108,9 @@ const OverallScoreDialog = ({ openEvent, handleCloseEvent }) => {
 
     setContestants(combinedData);
     setCategories(resCategories);
+    // dispatch({ type: actions.END_LOADING });
+
+    setLoading(false);
   };
 
   const handlePrint = useReactToPrint({
@@ -116,11 +122,15 @@ const OverallScoreDialog = ({ openEvent, handleCloseEvent }) => {
       {loading ? null : (
         <Dialog open={openEvent} fullScreen>
           <DialogContent>
-            <OverallReport
-              tableRef={tableRef}
-              categories={categories}
-              contestants={contestants}
-            />
+            {contestants.length > 0 && categories.length > 0 ? (
+              <OverallReport
+                tableRef={tableRef}
+                categories={categories}
+                contestants={contestants}
+              />
+            ) : (
+              <div>Loading...</div>
+            )}
 
             <DialogActions>
               <Button onClick={handlePrint} variant="contained">

@@ -156,46 +156,31 @@ const Contestant = () => {
       {
         accessorKey: "name",
         header: "Name",
-        Cell: ({ row, cell }) => (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: "1rem",
-            }}
-          >
-            <img
-              alt="avatar"
-              height={30}
-              src={`${imgUrl}${row.original.image}`}
-              loading="lazy"
-              style={{ borderRadius: "50%" }}
-            />
-            {/* using renderedCellValue instead of cell.getValue() preserves filter match highlighting */}
-            <span>{cell.getValue()}</span>
-          </Box>
-        ),
+        // Cell: ({ row, cell }) => (
+        //   <Box
+        //     sx={{
+        //       display: "flex",
+        //       alignItems: "center",
+        //       gap: "1rem",
+        //     }}
+        //   >
+        //     <img
+        //       alt="avatar"
+        //       height={30}
+        //       src={`${imgUrl}${row.original.image}`}
+        //       loading="lazy"
+        //       style={{ borderRadius: "50%" }}
+        //     />
+        //     {/* using renderedCellValue instead of cell.getValue() preserves filter match highlighting */}
+        //     <span>{cell.getValue()}</span>
+        //   </Box>
+        // ),
       },
       {
         accessorKey: "municipality",
         header: "Municipality",
       },
-      // {
-      //   accessorKey: "weight",
-      //   header: "Weight",
-      // },
-      // {
-      //   accessorKey: "height",
-      //   header: "Height",
-      // },
-      // {
-      //   accessorKey: "shoeSize",
-      //   header: "Shoe Size",
-      // },
-      // {
-      //   accessorKey: "swimsuitSize",
-      //   header: "Swimsuit Size",
-      // },
+
       {
         accessorKey: "bust",
         header: "Bust",
@@ -208,15 +193,6 @@ const Contestant = () => {
         accessorKey: "hips",
         header: "Hips",
       },
-      {
-        accessorKey: "nickname",
-        header: "Nickname",
-      },
-
-      // {
-      //   accessorKey: "birthPlace",
-      //   header: "Birth Place",
-      // },
       {
         accessorKey: "age",
         header: "Age",
@@ -241,7 +217,7 @@ const Contestant = () => {
               columns={columns}
               data={tableList}
               enableColumnActions={false}
-              enableSorting={false}
+              enableSorting={true}
               enableEditing
               initialState={{
                 density: "compact",

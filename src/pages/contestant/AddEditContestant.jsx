@@ -1,9 +1,11 @@
 import {
   AppBar,
   Avatar,
+  Backdrop,
   Box,
   Button,
   Card,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -46,22 +48,18 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
   const [image, setImage] = useState({});
   const [previewImage, setPreviewImage] = useState({});
 
-
   const {
-    state: { contestant, subEvent },
+    state: { contestant, subEvent, loading },
     dispatch,
   } = useValue();
 
   const imgUrl = process.env.REACT_APP_IMG;
   const actions = actionHelper();
 
-  useEffect(() => {
-    
-  }, []);
+  useEffect(() => {}, []);
 
   const handleSubmit = async (values) => {
-    // console.log(values);
-    // console.log({ image });
+    dispatch({ type: actions.START_LOADING });
     try {
       const dateFormatted = formatDatePicker(startDate.$d);
       let inputs = values;
@@ -74,6 +72,9 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
         showConfirmButton: false,
         timer: 2000,
       });
+
+      setImage({});
+      setPreviewImage({});
       handleCloseEvent();
     } catch (error) {
       console.log(error);
@@ -83,6 +84,7 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
         text: JSON.stringify(error.errors),
       });
     }
+    dispatch({ type: actions.END_LOADING });
   };
 
   const handleImageChange = (e) => {
@@ -112,42 +114,20 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
       label: "Municipality",
       md: 12,
     },
-    // {
-    //   name: "weight",
-    //   label: "Weight",
-    //   md: 3,
-    // },
-    // {
-    //   name: "height",
-    //   label: "Height",
-    //   md: 3,
-    // },
-    // {
-    //   name: "shoeSize",
-    //   label: "Shoe Size",
-    //   md: 3,
-    // },
-    // {
-    //   name: "swimsuitSize",
-    //   label: "Swimsuit Size",
-    //   md: 3,
-    // },
-
-    {
-      name: "nickname",
-      label: "Nickname",
-      md: 12,
-    },
-
-    // {
-    //   name: "birthPlace",
-    //   label: "Birth Place",
-    //   md: 3,
-    // },
     {
       name: "age",
       label: "Age",
       md: 12,
+    },
+    {
+      name: "weight",
+      label: "Weight",
+      md: 6,
+    },
+    {
+      name: "height",
+      label: "Height",
+      md: 6,
     },
     {
       name: "bust",
@@ -170,15 +150,9 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
     name: Yup.string().required("Please enter name"),
     municipality: Yup.string().required("Please enter municipality"),
     age: Yup.string().required("Please enter age"),
-    nickname: Yup.string().required("Please enter nickname"),
     bust: Yup.string().required("Please enter bust"),
     waist: Yup.string().required("Please enter waist"),
     hips: Yup.string().required("Please enter hips"),
-    // weight: Yup.string().required("Please enter weight"),
-    // height: Yup.string().required("Please enter height"),
-    // shoeSize: Yup.string().required("Please enter shoe size"),
-    // swimsuitSize: Yup.string().required("Please enter swimsuit size"),
-    // birthPlace: Yup.string().required("Please enter birth place"),
   });
 
   return (
@@ -238,18 +212,6 @@ const AddEditContestant = ({ openEvent, handleCloseEvent }) => {
                         </Grid>
                       );
                     })}
-
-                    {/* <Grid item md={3}>
-                      <DesktopDatePicker
-                        name="apDate"
-                        label="Date of Birth"
-                        inputFormat="DD/MM/YYYY"
-                        value={startDate}
-                        onChange={(newValue) => setStartDate(newValue)}
-                        slotProps={{ textField: { size: "small" } }}
-                        sx={{ width: "100%" }}
-                      />
-                    </Grid> */}
                   </Grid>
                 </Stack>
               </Card>

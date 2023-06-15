@@ -36,7 +36,7 @@ import { useValue } from "../../context/ContextProvider";
 import actionHelper from "../../context/actionHelper";
 
 import { indexContestantsEvents } from "../../api/contestantEventController";
-import OverallReport from "../../components/Report/OverallReport";
+import OverallReport from "./OverallReport";
 import PerSubEventReport from "../../components/Report/PerSubEventReport";
 
 const PerSubEventScoreDialog = ({ openEvent, handleCloseEvent }) => {

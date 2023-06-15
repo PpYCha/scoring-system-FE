@@ -39,6 +39,13 @@ export const storeContestant = async (value) => {
       headers: {
         "Content-Type": "multipart/form-data", // Set the content type to multipart/form-data
       },
+      onUploadProgress: (progressEvent) => {
+        const progress = Math.round(
+          (progressEvent.loaded * 100) / progressEvent.total
+        );
+        // Update progress state or perform any other action based on the progress
+        console.log(`Upload Progress: ${progress}%`);
+      },
     });
     return res;
   } catch (error) {
