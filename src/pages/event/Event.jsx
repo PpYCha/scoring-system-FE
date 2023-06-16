@@ -41,7 +41,7 @@ import {
 import AddEditSubEventDialog from "./AddEditSubEventDialog";
 import { deleteSubEvent, indexSubEvents } from "../../api/subEventController";
 import AddEditSettingsEventDialog from "./AddEditSettingsEventDialog";
-import PerSubEventScoreDialog from "../score/PerSubEventScoreDialog";
+import PerCategoryScoreDialog from "../score/PerCategoryScoreDialog";
 
 const Event = () => {
   const [tableList, setTableList] = useState([{}]);
@@ -491,7 +491,7 @@ const Event = () => {
           />
         )}
         {openSubEventScore && (
-          <PerSubEventScoreDialog
+          <PerCategoryScoreDialog
             openEvent={openSubEventScore}
             handleCloseEvent={handleClose}
           />

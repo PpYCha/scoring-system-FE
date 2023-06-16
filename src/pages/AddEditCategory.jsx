@@ -42,15 +42,21 @@ import {
   faArrowRight,
   faPenToSquare,
   faScaleUnbalancedFlip,
+  faSquarePollVertical,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import OverallReport from "./score/OverallReport";
+
+import PerCategoryScoreDialog from "./score/PerCategoryScoreDialog";
 
 const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
   const [startDate, setStartDate] = useState(dayjs());
   const [tableList, setTableList] = useState([{}]);
   const [openCriteria, setOpenCriteria] = useState(false);
   const [totalPercentage, setTotalPercentage] = useState(0);
+  const [openPerCategoryScore, setOpenPerCategoryScore] = useState(false);
+  const [categoryId, setCategoryId] = useState("");
+  const [categoryTitle, setCategoryTitle] = useState("");
 
   const {
     state: { category },
@@ -156,6 +162,17 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
     setOpenCriteria(false);
   };
 
+  const handlePerCategoryScore = async (e) => {
+    setCategoryId(e.original.id);
+    setCategoryTitle(e.original.category);
+
+    setOpenPerCategoryScore(true);
+  };
+
+  const handleClosePerCategoryScore = async () => {
+    setOpenPerCategoryScore(false);
+  };
+
   const textInput = [
     {
       name: "category",
@@ -228,14 +245,6 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
           </Stack>
         ),
       },
-      // {
-      //   accessorKey: "minimumPercentage",
-      //   header: "Minimum Score Percentage",
-      // },
-      // {
-      //   accessorKey: "maximumPercentage",
-      //   header: "Maximum Score Percentage",
-      // },
     ];
   }, [tableList]);
 
@@ -303,11 +312,23 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
                             />
                           </IconButton>
                         </Tooltip>
-                        {/* <Tooltip arrow placement="right" title="Edit">
-                          <IconButton onClick={(e) => handleEdit(row)}>
-                            <FontAwesomeIcon size="xs" icon={faPenToSquare} />
+                        <Tooltip
+                          arrow
+                          placement="right"
+                          title="Score Per Category"
+                        >
+                          <IconButton
+                            color="warning"
+                            onClick={(e) => {
+                              handlePerCategoryScore(row);
+                            }}
+                          >
+                            <FontAwesomeIcon
+                              icon={faSquarePollVertical}
+                              size="xs"
+                            />
                           </IconButton>
-                        </Tooltip> */}
+                        </Tooltip>
                         <Tooltip arrow placement="right" title="Delete">
                           <IconButton
                             color="error"
@@ -331,10 +352,21 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
         </DialogContent>
       </Dialog>
 
-      <AddEditCriteria
-        openEvent={openCriteria}
-        handleCloseEvent={handleClose}
-      />
+      {openCriteria && (
+        <AddEditCriteria
+          openEvent={openCriteria}
+          handleCloseEvent={handleClosePerCategoryScore}
+        />
+      )}
+
+      {openPerCategoryScore && (
+        <PerCategoryScoreDialog
+          openEvent={openPerCategoryScore}
+          categoryId={categoryId}
+          categoryTitle={categoryTitle}
+          handleCloseEvent={handleClosePerCategoryScore}
+        />
+      )}
     </>
   );
 };

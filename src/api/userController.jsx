@@ -22,7 +22,7 @@ export const storeUser = async (value) => {
       password: value.password,
       contactNumber: value.contactNumber,
       status: value.status,
-      event: value.event,
+      event_id: value.event,
       role: value.role,
     });
 
@@ -59,7 +59,7 @@ export const updateUser = async (id, value) => {
       password: value.password,
       contactNumber: value.contactNumber,
       status: value.status,
-      event: value.event,
+      event_id: value.event,
       role: value.role,
     });
 

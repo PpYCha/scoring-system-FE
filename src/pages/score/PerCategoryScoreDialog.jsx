@@ -38,16 +38,25 @@ import actionHelper from "../../context/actionHelper";
 import { indexContestantsEvents } from "../../api/contestantEventController";
 import OverallReport from "./OverallReport";
 import PerSubEventReport from "../../components/Report/PerSubEventReport";
+import PerCategoryScore from "./PerCategoryScore";
+import { indexCriterias } from "../../api/criteriaController";
 
-const PerSubEventScoreDialog = ({ openEvent, handleCloseEvent }) => {
+const PerCategoryScoreDialog = ({
+  openEvent,
+  handleCloseEvent,
+  categoryId,
+  categoryTitle,
+}) => {
   const [categories, setCategories] = useState([{}]);
   const [contestants, setContestants] = useState([{}]);
   const [scores, setScores] = useState([{}]);
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const tableRef = useRef();
 
   const {
-    state: { loading, contestant },
+    state: { contestant },
     dispatch,
   } = useValue();
 
@@ -58,46 +67,69 @@ const PerSubEventScoreDialog = ({ openEvent, handleCloseEvent }) => {
   }, [openEvent]);
 
   const fetch = async () => {
-    // dispatch({ type: actions.START_LOADING });
-    const [resContestant, resCategories, resScore] = await Promise.all([
-      indexContestants(),
-      indexCategories(),
-      indexScores(),
-    ]);
+    setLoading(true);
+    const [resContestant, resCategories, resScore, resCriteria] =
+      await Promise.all([
+        indexContestants(),
+        indexCategories(),
+        indexScores(),
+        indexCriterias(),
+      ]);
 
-    const combinedData = resScore.reduce((acc, score) => {
-      const judgeId = score.judge_id;
+    const sortedContestants = resContestant.sort((a, b) => {
+      const contestantNumberA = Number(a.cotestant_number);
+      const contestantNumberB = Number(b.cotestant_number);
 
-      if (!acc[judgeId]) {
-        acc[judgeId] = {
-          judge_id: judgeId,
-          contestants: [],
-        };
-      }
+      return contestantNumberA - contestantNumberB;
+    });
 
-      const contestant = resContestant.find(
-        (contestant) => contestant.id === score.contestant_id
+    const combinedData = sortedContestants.map((contestant) => {
+      const contestantScores = resScore.filter(
+        (score) => score.contestant_id === contestant.id
       );
 
-      if (contestant) {
-        acc[judgeId].contestants.push({
-          contestant,
+      const categoryScores = {};
+
+      contestantScores.forEach((score) => {
+        const categoryId = score.category_id;
+
+        if (!categoryScores[categoryId]) {
+          categoryScores[categoryId] = {
+            category_id: categoryId,
+
+            scores: [],
+            totalScore: 0,
+          };
+        }
+
+        categoryScores[categoryId].scores.push({
+          score_id: score.id,
+          judge: score.judge_id,
           score: score.score,
+          criteria_id: score.criteria_id,
         });
-      }
 
-      return acc;
-    }, {});
+        categoryScores[categoryId].totalScore += parseInt(score.score);
+      });
 
-    const filteredCategories = resCategories.filter(
-      (item) => item.subEvent_id === contestant.subEvent_id
+      const categories = Object.values(categoryScores);
+
+      return {
+        ...contestant,
+        categories,
+      };
+    });
+
+    const filteredCategories = resCriteria.filter(
+      (item) => item.category_id === categoryId
     );
 
     setContestants(combinedData);
+
+    console.log(combinedData);
     setCategories(filteredCategories);
 
-    // Use the grouped and scored data as needed
-    // dispatch({ type: actions.END_LOADING });
+    setLoading(false);
   };
 
   const handlePrint = useReactToPrint({
@@ -109,32 +141,14 @@ const PerSubEventScoreDialog = ({ openEvent, handleCloseEvent }) => {
       {loading ? null : (
         <Dialog open={openEvent} fullScreen>
           <DialogContent>
-            <PerSubEventReport
-              tableRef={tableRef}
-              contestants={contestants}
-              categories={categories}
-              textHeader={
-                <>
-                  {/* <Typography variant="subtitle1" mb={-1}>
-                    Republic of the Philippines
-                  </Typography>
-                  <Typography variant="subtitle1" mb={-1}>
-                    Province of Northern Samar
-                  </Typography>
-                  <Typography variant="subtitle1" mb={-1}>
-                    Provincial Tourism Office
-                  </Typography>
-                  <Typography variant="h6" mb={-1}>
-                    Mutya san Ibabao 2023
-                  </Typography> */}
-                  <Typography variant="h6" mb={-1}>
-                    Talent Competition Score Sheet
-                  </Typography>
-                </>
-              }
-            />
-
             <DialogActions>
+              <PerCategoryScore
+                tableRef={tableRef}
+                categories={categories}
+                contestants={contestants}
+                categoryTitle={categoryTitle}
+              />
+
               <Button onClick={handlePrint} variant="contained">
                 Print
               </Button>
@@ -147,4 +161,4 @@ const PerSubEventScoreDialog = ({ openEvent, handleCloseEvent }) => {
   );
 };
 
-export default PerSubEventScoreDialog;
+export default PerCategoryScoreDialog;

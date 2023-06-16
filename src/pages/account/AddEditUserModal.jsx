@@ -21,6 +21,7 @@ import { showUser, storeUser, updateUser } from "../../api/userController";
 import Swal from "sweetalert2";
 import SelectComponent from "../../components/SelectComponent";
 import actionHelper from "../../context/actionHelper";
+import { showEvent } from "../../api/eventController";
 
 const AddEditUserModal = ({
   open,
@@ -42,6 +43,9 @@ const AddEditUserModal = ({
 
   const handleSubmit = async (values, { setFieldError }) => {
     try {
+      const resEventId = await showEvent(values.event);
+      values.event = resEventId.data.event.id;
+
       let res;
       if (userAccount.id) {
         res = await updateUser(userAccount.id, values);

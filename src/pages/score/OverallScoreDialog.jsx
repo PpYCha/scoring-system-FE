@@ -106,7 +106,14 @@ const OverallScoreDialog = ({ openEvent, handleCloseEvent }) => {
     //   (item) => item.subEvent_id === contestant.subEvent_id
     // );
 
-    setContestants(combinedData);
+    const sortedContestants = combinedData.sort((a, b) => {
+      const contestantNumberA = Number(a.cotestant_number);
+      const contestantNumberB = Number(b.cotestant_number);
+
+      return contestantNumberA - contestantNumberB;
+    });
+
+    setContestants(sortedContestants);
     setCategories(resCategories);
     // dispatch({ type: actions.END_LOADING });
 
