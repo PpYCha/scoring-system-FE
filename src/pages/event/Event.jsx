@@ -42,6 +42,7 @@ import AddEditSubEventDialog from "./AddEditSubEventDialog";
 import { deleteSubEvent, indexSubEvents } from "../../api/subEventController";
 import AddEditSettingsEventDialog from "./AddEditSettingsEventDialog";
 import PerCategoryScoreDialog from "../score/PerCategoryScoreDialog";
+import { showEventEdit } from "../../api/contestantEventController";
 
 const Event = () => {
   const [tableList, setTableList] = useState([{}]);
@@ -53,6 +54,7 @@ const Event = () => {
   const [openScore, setOpenScore] = useState(false);
   const [openSettingsEvent, setOpenSettingsEvent] = useState(false);
   const [openSubEventScore, setOpenSubEventScore] = useState(false);
+  const [subEventid, setSubEventid] = useState("");
 
   const [anchorEl, setAnchorEl] = useState(null);
   const openScoreMenu = Boolean(anchorEl);
@@ -98,34 +100,48 @@ const Event = () => {
       console.log(error);
     }
   };
-  const handleSubEvent = async (e) => {
-    // console.log(e);
-
-    if (e.event_id) {
-      console.log(e);
-      dispatch({
-        type: actions.UPDATE_SUBEVENT,
-        payload: {
-          title: e.title,
-          date: e.date,
-          event_id: e.event_id,
-          id: e.id,
-        },
-      });
-    } else {
-      const res = await showEvent(e.original.id);
-
-      if (res.status === 200) {
+  const handleAddSubEvent = async (e) => {
+    try {
+      if (e.original.id) {
         dispatch({
           type: actions.UPDATE_SUBEVENT,
           payload: {
-            event_id: res.data.event.id,
+            event_id: e.original.id,
           },
         });
       }
+      setOpenSubEvent(true);
+    } catch (error) {
+      console.log(error);
     }
-    setOpenSubEvent(true);
+  };
+  const handleSubEvent = async (e) => {
+    console.log(e.original.id);
     try {
+      if (e.original.id) {
+        console.log(e);
+        dispatch({
+          type: actions.UPDATE_SUBEVENT,
+          payload: {
+            title: e.title,
+            date: e.date,
+            event_id: e.event_id,
+            id: e.id,
+          },
+        });
+      } else {
+        const res = await showEventEdit(e.original.id);
+
+        if (res.status === 200) {
+          dispatch({
+            type: actions.UPDATE_SUBEVENT,
+            payload: {
+              event_id: res.data.event.id,
+            },
+          });
+        }
+      }
+      setOpenSubEvent(true);
     } catch (error) {
       console.log(error);
     }
@@ -156,7 +172,7 @@ const Event = () => {
           subEvent_id: item.id,
         },
       });
-
+      setSubEventid(item.id);
       dispatch({ type: actions.END_LOADING });
       setOpenScore(true);
     } catch (error) {
@@ -215,6 +231,7 @@ const Event = () => {
   };
 
   const handleEditEvent = async (e) => {
+    console.log("edit");
     try {
       const res = await showEvent(e.original.id);
 
@@ -317,7 +334,7 @@ const Event = () => {
                   <Tooltip arrow placement="left" title="Sub Event">
                     <IconButton
                       color="primary"
-                      onClick={(e) => handleSubEvent(row)}
+                      onClick={(e) => handleAddSubEvent(row)}
                     >
                       <FontAwesomeIcon icon={faCalendarPlus} size="xs" />
                     </IconButton>
@@ -341,7 +358,7 @@ const Event = () => {
                     </IconButton>
                   </Tooltip>
 
-                  <Tooltip arrow placement="right" title="Event Settings">
+                  {/* <Tooltip arrow placement="right" title="Event Settings">
                     <IconButton
                       onClick={(e) => {
                         handleSettingsEvent(row);
@@ -353,7 +370,7 @@ const Event = () => {
                         style={{ color: "#5c5c5c" }}
                       />
                     </IconButton>
-                  </Tooltip>
+                  </Tooltip> */}
                   <Tooltip arrow placement="right" title="Delete">
                     <IconButton
                       color="error"
@@ -487,6 +504,7 @@ const Event = () => {
         {openScore && (
           <OverallScoreDialog
             openEvent={openScore}
+            subEventid={subEventid}
             handleCloseEvent={handleClose}
           />
         )}

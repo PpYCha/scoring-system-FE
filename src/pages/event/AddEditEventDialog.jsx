@@ -23,8 +23,6 @@ import actionHelper from "../../context/actionHelper";
 const AddEditEventDialog = ({ openEvent, handleCloseEvent }) => {
   const [startDate, setStartDate] = useState(dayjs());
 
-  console.log("testing");
-
   const {
     state: { event },
     dispatch,

@@ -12,6 +12,8 @@ import {
   Tooltip,
   Typography,
   Divider,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import { Form, Formik } from "formik";
 import React, { useEffect, useMemo, useState } from "react";
@@ -45,9 +47,9 @@ import {
   faSquarePollVertical,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import OverallReport from "./score/OverallReport";
 
 import PerCategoryScoreDialog from "./score/PerCategoryScoreDialog";
+import PerJudgeScoreDialog from "./score/PerJudgeScoreDialog";
 
 const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
   const [startDate, setStartDate] = useState(dayjs());
@@ -57,9 +59,13 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
   const [openPerCategoryScore, setOpenPerCategoryScore] = useState(false);
   const [categoryId, setCategoryId] = useState("");
   const [categoryTitle, setCategoryTitle] = useState("");
+  const [openPerJudgeScore, setOpenPerJudgeScore] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [judgeId, setJudgeId] = useState("");
+  const [judgeName, setJudgeName] = useState("");
 
   const {
-    state: { category },
+    state: { category, judge },
     dispatch,
   } = useValue();
 
@@ -158,21 +164,41 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
     }
   };
 
-  const handleClose = async () => {
+  const handlePerCategoryScore = (e) => {
+    setCategoryId(e.original.id);
+    setCategoryTitle(e.original.category);
+    setOpenPerCategoryScore(true);
+  };
+  const handlePerJudgeScore = async (row, jName, Jid) => {
+    console.log(row);
+
+    setJudgeId(Jid);
+    dispatch({
+      type: actions.UPDATE_JUDGEID,
+      payload: {
+        id: Jid,
+      },
+    });
+    setJudgeName(jName);
+    setOpenPerJudgeScore(true);
+  };
+
+  const handleCloseScore = async () => {
+    setOpenPerCategoryScore(false);
+    setOpenPerJudgeScore(false);
     setOpenCriteria(false);
   };
 
-  const handlePerCategoryScore = async (e) => {
-    setCategoryId(e.original.id);
-    setCategoryTitle(e.original.category);
-
-    setOpenPerCategoryScore(true);
+  const handleMenuOpen = (row, e) => {
+    console.log(row);
+    setCategoryId(row.original.id);
+    setCategoryTitle(row.original.category);
+    setAnchorEl(e.currentTarget);
   };
 
-  const handleClosePerCategoryScore = async () => {
-    setOpenPerCategoryScore(false);
+  const handleMenuClose = () => {
+    setAnchorEl(null);
   };
-
   const textInput = [
     {
       name: "category",
@@ -189,11 +215,11 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
       label: "Percentage",
       md: 6,
     },
-    // {
-    //   name: "minimumPercentage",
-    //   label: "Minimum Score Percentage",
-    //   md: 6,
-    // },
+    {
+      name: "minimumPercentage",
+      label: "Minimum Score Percentage",
+      md: 6,
+    },
     // {
     //   name: "maximumPercentage",
     //   label: "Maximum Score Percentage",
@@ -329,6 +355,151 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
                             />
                           </IconButton>
                         </Tooltip>
+                        {/* <Tooltip
+                          arrow
+                          placement="right"
+                          title="Score Per Judge"
+                        >
+                          <IconButton
+                            color="info"
+                            onClick={(e) => {
+                              handlePerJudgeScore(row);
+                            }}
+                          >
+                            <FontAwesomeIcon
+                              icon={faSquarePollVertical}
+                              size="xs"
+                            />
+                          </IconButton>
+                        </Tooltip> */}
+                        <Tooltip
+                          arrow
+                          placement="right"
+                          title="Score Per Judge"
+                        >
+                          <IconButton
+                            color="info"
+                            onClick={(e) => handleMenuOpen(row, e)}
+                          >
+                            <FontAwesomeIcon
+                              icon={faSquarePollVertical}
+                              size="xs"
+                            />
+                          </IconButton>
+                        </Tooltip>
+                        <Menu
+                          anchorEl={anchorEl}
+                          open={Boolean(anchorEl)}
+                          onClose={handleMenuClose}
+                        >
+                          <MenuItem
+                            onClick={(e) => {
+                              handlePerJudgeScore(
+                                row,
+                                "HANS VANDER SANDE",
+                                "9"
+                              );
+                            }}
+                          >
+                            HANS VANDER SANDE
+                          </MenuItem>
+                          <MenuItem
+                            onClick={(e) => {
+                              handlePerJudgeScore(row, "GAYE DAYRIT", "10");
+                            }}
+                          >
+                            GAYE DAYRIT
+                          </MenuItem>
+                          <MenuItem
+                            onClick={(e) => {
+                              handlePerJudgeScore(
+                                row,
+                                "KRISTINE CABALLERO APLAL",
+                                "11"
+                              );
+                            }}
+                          >
+                            KRISTINE CABALLERO APLAL
+                          </MenuItem>
+                          <MenuItem
+                            onClick={(e) => {
+                              handlePerJudgeScore(row, "RENEE SALUD", "12");
+                            }}
+                          >
+                            RENEE SALUD
+                          </MenuItem>
+                          <MenuItem
+                            onClick={(e) => {
+                              handlePerJudgeScore(
+                                row,
+                                "HANNAH KHAYLE IGLESIA",
+                                "13"
+                              );
+                            }}
+                          >
+                            HANNAH KHAYLE IGLESIA
+                          </MenuItem>
+                          <MenuItem
+                            onClick={(e) => {
+                              handlePerJudgeScore(
+                                row,
+                                "ANDREW GOTIANUN III",
+                                "14"
+                              );
+                            }}
+                          >
+                            ANDREW GOTIANUN III
+                          </MenuItem>
+                          <MenuItem
+                            onClick={(e) => {
+                              handlePerJudgeScore(
+                                row,
+                                "Col. EFREN MORADOS",
+                                "15"
+                              );
+                            }}
+                          >
+                            Col. EFREN MORADOS
+                          </MenuItem>
+                          <Divider />
+                          {/*  */}
+                          <MenuItem
+                            onClick={(e) => {
+                              handlePerJudgeScore(row, "MR. PICSON", "3");
+                            }}
+                          >
+                            MR. PICSON
+                          </MenuItem>
+                          <MenuItem
+                            onClick={(e) => {
+                              handlePerJudgeScore(row, "PD. REGIS", "4");
+                            }}
+                          >
+                            PD. REGIS
+                          </MenuItem>
+                          <MenuItem
+                            onClick={(e) => {
+                              handlePerJudgeScore(row, "P/COL TADEFA", "5");
+                            }}
+                          >
+                            P/COL TADEFA
+                          </MenuItem>
+                          <MenuItem
+                            onClick={(e) => {
+                              handlePerJudgeScore(row, "PD. MAQUELABIT", "6");
+                            }}
+                          >
+                            PD. MAQUELABIT
+                          </MenuItem>
+                          <MenuItem
+                            onClick={(e) => {
+                              handlePerJudgeScore(row, "ATTY. AMACNA", "2");
+                            }}
+                          >
+                            ATTY. AMACNA
+                          </MenuItem>
+                        </Menu>
+
                         <Tooltip arrow placement="right" title="Delete">
                           <IconButton
                             color="error"
@@ -355,7 +526,7 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
       {openCriteria && (
         <AddEditCriteria
           openEvent={openCriteria}
-          handleCloseEvent={handleClosePerCategoryScore}
+          handleCloseEvent={handleCloseScore}
         />
       )}
 
@@ -364,7 +535,18 @@ const AddEditCategory = ({ openEvent, handleCloseEvent }) => {
           openEvent={openPerCategoryScore}
           categoryId={categoryId}
           categoryTitle={categoryTitle}
-          handleCloseEvent={handleClosePerCategoryScore}
+          handleCloseEvent={handleCloseScore}
+        />
+      )}
+
+      {openPerJudgeScore && (
+        <PerJudgeScoreDialog
+          openEvent={openPerJudgeScore}
+          categoryId={categoryId}
+          categoryTitle={categoryTitle}
+          handleCloseEvent={handleCloseScore}
+          judgeId={judgeId}
+          judgeName={judgeName}
         />
       )}
     </>

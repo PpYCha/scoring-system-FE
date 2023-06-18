@@ -7,6 +7,7 @@ import {
   DialogTitle,
   Grid,
   Paper,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -40,8 +41,10 @@ import OverallReport from "./OverallReport";
 import PerSubEventReport from "../../components/Report/PerSubEventReport";
 import PerCategoryScore from "./PerCategoryScore";
 import { indexCriterias } from "../../api/criteriaController";
+import PerJudgeScore from "./PerJudgeScore";
+import { indexUsers } from "../../api/userController";
 
-const PerCategoryScoreDialog = ({
+const PerJudgeScoreDialog = ({
   openEvent,
   handleCloseEvent,
   categoryId,
@@ -52,6 +55,7 @@ const PerCategoryScoreDialog = ({
   const [scores, setScores] = useState([{}]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState([]);
 
   const tableRef = useRef();
 
@@ -68,12 +72,13 @@ const PerCategoryScoreDialog = ({
 
   const fetch = async () => {
     setLoading(true);
-    const [resContestant, resCategories, resScore, resCriteria] =
+    const [resContestant, resCategories, resScore, resCriteria, resUser] =
       await Promise.all([
         indexContestants(),
         indexCategories(),
         indexScores(),
         indexCriterias(),
+        indexUsers(),
       ]);
 
     const sortedContestants = resContestant.sort((a, b) => {
@@ -126,7 +131,7 @@ const PerCategoryScoreDialog = ({
 
     setContestants(combinedData);
     setCategories(filteredCategories);
-
+    setUsers(resUser);
     setLoading(false);
   };
 
@@ -141,19 +146,41 @@ const PerCategoryScoreDialog = ({
           <DialogContent>
             <DialogActions>
               {contestants.length > 0 && categories.length > 0 ? (
-                <PerCategoryScore
-                  tableRef={tableRef}
-                  categories={categories}
-                  contestants={contestants}
-                  categoryTitle={categoryTitle}
-                />
+                <>
+                  <Stack
+                    direction="column"
+                    justifyContent="flex-start"
+                    alignItems="flex-start"
+                    spacing={2}
+                  >
+                    {users.map((item) => {
+                      if (item.role === "Judge") {
+                        return (
+                          <>
+                            <div key={item.id}>
+                              <PerJudgeScore
+                                key={item.id} // Assuming each user has a unique identifier
+                                tableRef={tableRef}
+                                categories={categories}
+                                contestants={contestants}
+                                categoryTitle={categoryTitle}
+                                judgeId={item.id}
+                              />
+                              <Button onClick={handlePrint} variant="contained">
+                                Print
+                              </Button>
+                            </div>
+                          </>
+                        );
+                      }
+                      return null; // Return null if the condition is not met
+                    })}
+                  </Stack>
+                </>
               ) : (
                 <div>Loading...</div>
               )}
 
-              <Button onClick={handlePrint} variant="contained">
-                Print
-              </Button>
               <ButtonCancel handleClose={handleCloseEvent} />
             </DialogActions>
           </DialogContent>
@@ -163,4 +190,4 @@ const PerCategoryScoreDialog = ({
   );
 };
 
-export default PerCategoryScoreDialog;
+export default PerJudgeScoreDialog;

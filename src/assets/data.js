@@ -1,31 +1,31 @@
 export const judges = [
   {
     id: 1,
-    name: "JUDGE # 1: MR. PICSON",
+    name: "HANS VANDER SANDE",
   },
   {
     id: 2,
-    name: "JUDGE # 2: PD. REGIS",
+    name: "GAYE DARIT",
   },
   {
     id: 3,
-    name: "JUDGE # 3: P/COL TADEFA",
+    name: "KRISTINE CABALLERO APLAL",
   },
   {
     id: 4,
-    name: "JUDGE # 4: PD. MAQUELABIT",
+    name: "RENEE SALUD",
   },
   {
     id: 5,
-    name: "JUDGE # 5: ATTY. AMACNA",
+    name: "HANNAH KHAYLE IGLESIA",
   },
   {
     id: 6,
-    name: "JUDGE # 6: ATTY. RICKY DULA",
+    name: "ANDREW GOTIANUN III",
   },
   {
     id: 7,
-    name: "JUDGE # 7: ENG. ALEX OLESCO",
+    name: "Col. EFREN MORADOS",
   },
 ];
 export const tabulator = [
@@ -35,11 +35,11 @@ export const tabulator = [
   },
   {
     id: 2,
-    name: "MR. JAYSON ATICADO",
+    name: "MR. JAYSON ATICALDO",
   },
   {
     id: 3,
-    name: "MR. FREDEREICK GELERA",
+    name: "MR. FREDRICK GELERA",
   },
   {
     id: 4,
@@ -59,3 +59,11 @@ export const scores = [
     category_id: 17,
   },
 ];
+
+// JUDGE # 1:
+// JUDGE # 2:
+// JUDGE # 3:
+// JUDGE # 4:
+// JUDGE # 5:
+// JUDGE # 6:
+// JUDGE # 7:

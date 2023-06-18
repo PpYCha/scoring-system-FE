@@ -28,8 +28,6 @@ const JudgeLayout = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  
-
   const criteriaTalent = [
     {
       id: 3,
@@ -94,7 +92,7 @@ const JudgeLayout = () => {
     setLoading(true);
     const ev_id = 1;
     const sub_id = 2;
-    const cat_id = 4;
+    const cat_id = 2;
 
     const promises = [];
 

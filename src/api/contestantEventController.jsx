@@ -64,3 +64,14 @@ export const indexContestantsEvents = async () => {
 //     throw error;
 //   }
 // };
+
+// Display the specified resource.
+export const showEventEdit = async (id) => {
+  try {
+    const res = await axios.get(`${apiUrl}contestantsevents/${id}`);
+
+    return res;
+  } catch (error) {
+    throw error;
+  }
+};

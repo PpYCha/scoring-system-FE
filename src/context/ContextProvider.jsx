@@ -19,6 +19,9 @@ const initialState = {
     description: "",
     date: "",
   },
+  judge: {
+    id: "",
+  },
   subEvent: {
     title: "",
     date: "",

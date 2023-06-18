@@ -19,23 +19,39 @@ const PerCategoryScore = ({
   categoryTitle,
 }) => {
   const calculateTotalScore = (item, category) => {
-    console.log("item", item);
-    // console.log("category", category);
-    console.log("categories", categories);
-
     const contestantCategory = item.categories?.find(
       (cat) => cat.category_id === category.category_id
     );
-    //filter the contestantCategory to criteria
 
-    // const filteredCriteriaScore =
+    const scores = contestantCategory?.scores;
+    let totalScore = 0;
+    let averageScore = 0;
 
-    const totalScore = contestantCategory?.totalScore;
-    const categoryPercentage = category.percentage || 0;
+    if (scores && scores.length > 0) {
+      // Filter scores based on criteria_id matching category_id
+      const filteredScores = scores.filter(
+        (score) => score.criteria_id === category.id
+      );
+      // Sum up the filtered scores
+      totalScore = filteredScores.reduce(
+        (acc, score) => acc + parseFloat(score.score, 10),
+        0
+      );
 
-    const totalWeight = categoryPercentage / 100;
-    const calculatedScore = totalScore ? totalScore * totalWeight : null;
-    return calculatedScore;
+      // Calculate the average score
+      averageScore = totalScore / filteredScores.length;
+    }
+
+    return averageScore;
+  };
+
+  const calculateRank = (contestants, item, category) => {
+    const itemScore = calculateTotalScore(item, category);
+    const sortedScores = contestants
+      .map((contestant) => calculateTotalScore(contestant, category))
+      .sort((a, b) => b - a);
+
+    return sortedScores.indexOf(itemScore) + 1;
   };
 
   return (
@@ -123,9 +139,7 @@ const PerCategoryScore = ({
                       <span style={{ color: "red" }}>N/A</span>
                     )}
                   </TableCell>
-                  <TableCell align="center" sx={{ fontSize: 8 }}>
-                    1
-                  </TableCell>
+                  <TableCell></TableCell>
                 </TableRow>
               );
             })

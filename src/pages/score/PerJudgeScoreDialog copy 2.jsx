@@ -7,6 +7,7 @@ import {
   DialogTitle,
   Grid,
   Paper,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -35,13 +36,11 @@ import { useReactToPrint } from "react-to-print";
 import { useValue } from "../../context/ContextProvider";
 import actionHelper from "../../context/actionHelper";
 
-import { indexContestantsEvents } from "../../api/contestantEventController";
-import OverallReport from "./OverallReport";
-import PerSubEventReport from "../../components/Report/PerSubEventReport";
-import PerCategoryScore from "./PerCategoryScore";
 import { indexCriterias } from "../../api/criteriaController";
+import PerJudgeScore from "./PerJudgeScore";
+import { indexUsers } from "../../api/userController";
 
-const PerCategoryScoreDialog = ({
+const PerJudgeScoreDialog = ({
   openEvent,
   handleCloseEvent,
   categoryId,
@@ -52,8 +51,9 @@ const PerCategoryScoreDialog = ({
   const [scores, setScores] = useState([{}]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState([]);
 
-  const tableRef = useRef();
+  const componentRefs = useRef([]);
 
   const {
     state: { contestant },
@@ -68,12 +68,13 @@ const PerCategoryScoreDialog = ({
 
   const fetch = async () => {
     setLoading(true);
-    const [resContestant, resCategories, resScore, resCriteria] =
+    const [resContestant, resCategories, resScore, resCriteria, resUser] =
       await Promise.all([
         indexContestants(),
         indexCategories(),
         indexScores(),
         indexCriterias(),
+        indexUsers(),
       ]);
 
     const sortedContestants = resContestant.sort((a, b) => {
@@ -126,12 +127,12 @@ const PerCategoryScoreDialog = ({
 
     setContestants(combinedData);
     setCategories(filteredCategories);
-
+    setUsers(resUser);
     setLoading(false);
   };
 
   const handlePrint = useReactToPrint({
-    content: () => tableRef.current,
+    content: () => componentRefs.current,
   });
 
   return (
@@ -141,20 +142,61 @@ const PerCategoryScoreDialog = ({
           <DialogContent>
             <DialogActions>
               {contestants.length > 0 && categories.length > 0 ? (
-                <PerCategoryScore
-                  tableRef={tableRef}
-                  categories={categories}
-                  contestants={contestants}
-                  categoryTitle={categoryTitle}
-                />
+                <>
+                  <Stack
+                    direction="column"
+                    justifyContent="flex-start"
+                    alignItems="flex-start"
+                    spacing={2}
+                  >
+                    <PerJudgeScore
+                      ref={componentRefs}
+                      categories={categories}
+                      contestants={contestants}
+                      categoryTitle={categoryTitle}
+                      judgeId={2}
+                      judgeName={"ATTY. AMACNA"}
+                      handlePrint={handlePrint}
+                    />
+                    <PerJudgeScore
+                      ref={componentRefs}
+                      categories={categories}
+                      contestants={contestants}
+                      categoryTitle={categoryTitle}
+                      judgeId={3}
+                      judgeName={"MR. PICSON"}
+                    />
+                    <PerJudgeScore
+                      ref={componentRefs}
+                      categories={categories}
+                      contestants={contestants}
+                      categoryTitle={categoryTitle}
+                      judgeId={4}
+                      judgeName={"PD. REGIS"}
+                    />
+                    <PerJudgeScore
+                      ref={componentRefs}
+                      categories={categories}
+                      contestants={contestants}
+                      categoryTitle={categoryTitle}
+                      judgeId={5}
+                      judgeName={"P/COL TADEFA"}
+                    />
+                    <PerJudgeScore
+                      ref={componentRefs}
+                      categories={categories}
+                      contestants={contestants}
+                      categoryTitle={categoryTitle}
+                      judgeId={6}
+                      judgeName={"PD. MAQUELABIT"}
+                    />
+
+                    <ButtonCancel handleClose={handleCloseEvent} />
+                  </Stack>
+                </>
               ) : (
                 <div>Loading...</div>
               )}
-
-              <Button onClick={handlePrint} variant="contained">
-                Print
-              </Button>
-              <ButtonCancel handleClose={handleCloseEvent} />
             </DialogActions>
           </DialogContent>
         </Dialog>
@@ -163,4 +205,4 @@ const PerCategoryScoreDialog = ({
   );
 };
 
-export default PerCategoryScoreDialog;
+export default PerJudgeScoreDialog;

@@ -7,6 +7,7 @@ import {
   DialogTitle,
   Grid,
   Paper,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -35,19 +36,30 @@ import { useReactToPrint } from "react-to-print";
 import { useValue } from "../../context/ContextProvider";
 import actionHelper from "../../context/actionHelper";
 
-import { indexContestantsEvents } from "../../api/contestantEventController";
-import OverallReport from "../../components/Report/OverallReport";
-import PerSubEventReport from "../../components/Report/PerSubEventReport";
+import { indexCriterias } from "../../api/criteriaController";
+import PerJudgeScore from "./PerJudgeScore";
+import { indexUsers } from "../../api/userController";
 
-const PerSubEventScoreDialog = ({ openEvent, handleCloseEvent }) => {
+const PerJudgeScoreDialog = ({
+  openEvent,
+  handleCloseEvent,
+  categoryId,
+  categoryTitle,
+  judgeName,
+  judgeId,
+}) => {
   const [categories, setCategories] = useState([{}]);
-  const [contestants, setContestants] = useState([{}]);
+  const [contestants, setContestants] = useState([]);
   const [scores, setScores] = useState([{}]);
   const [open, setOpen] = useState(false);
-  const tableRef = useRef();
+  const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [judgeIdIne, setJudgeIdIne] = useState("");
+
+  const tableRef = useRef([]);
 
   const {
-    state: { loading, contestant },
+    state: { contestant },
     dispatch,
   } = useValue();
 
@@ -58,15 +70,24 @@ const PerSubEventScoreDialog = ({ openEvent, handleCloseEvent }) => {
   }, [openEvent]);
 
   const fetch = async () => {
-    const [resContestant, resCategories, resScore, resContestantsEvents] =
+    setLoading(true);
+    const [resContestant, resCategories, resScore, resCriteria, resUser] =
       await Promise.all([
         indexContestants(),
         indexCategories(),
         indexScores(),
-        indexContestantsEvents(),
+        indexCriterias(),
+        indexUsers(),
       ]);
 
-    const combinedData = resContestant.map((contestant) => {
+    const sortedContestants = resContestant.sort((a, b) => {
+      const contestantNumberA = Number(a.cotestant_number);
+      const contestantNumberB = Number(b.cotestant_number);
+
+      return contestantNumberA - contestantNumberB;
+    });
+
+    const combinedData = sortedContestants.map((contestant) => {
       const contestantScores = resScore.filter(
         (score) => score.contestant_id === contestant.id
       );
@@ -79,6 +100,7 @@ const PerSubEventScoreDialog = ({ openEvent, handleCloseEvent }) => {
         if (!categoryScores[categoryId]) {
           categoryScores[categoryId] = {
             category_id: categoryId,
+
             scores: [],
             totalScore: 0,
           };
@@ -88,9 +110,10 @@ const PerSubEventScoreDialog = ({ openEvent, handleCloseEvent }) => {
           score_id: score.id,
           judge: score.judge_id,
           score: score.score,
+          criteria_id: score.criteria_id,
         });
 
-        categoryScores[categoryId].totalScore += parseFloat(score.score);
+        categoryScores[categoryId].totalScore += parseInt(score.score);
       });
 
       const categories = Object.values(categoryScores);
@@ -101,12 +124,16 @@ const PerSubEventScoreDialog = ({ openEvent, handleCloseEvent }) => {
       };
     });
 
-    const filteredCategories = resCategories.filter(
-      (item) => item.subEvent_id === contestant.subEvent_id
+    const filteredCategories = resCriteria.filter(
+      (item) => item.category_id === categoryId
     );
 
     setContestants(combinedData);
     setCategories(filteredCategories);
+    setUsers(resUser);
+    setJudgeIdIne(judgeId);
+    console.log("iddddd", judgeId);
+    setLoading(false);
   };
 
   const handlePrint = useReactToPrint({
@@ -118,36 +145,30 @@ const PerSubEventScoreDialog = ({ openEvent, handleCloseEvent }) => {
       {loading ? null : (
         <Dialog open={openEvent} fullScreen>
           <DialogContent>
-            <PerSubEventReport
-              tableRef={tableRef}
-              contestants={contestants}
-              categories={categories}
-              textHeader={
-                <>
-                  {/* <Typography variant="subtitle1" mb={-1}>
-                    Republic of the Philippines
-                  </Typography>
-                  <Typography variant="subtitle1" mb={-1}>
-                    Province of Northern Samar
-                  </Typography>
-                  <Typography variant="subtitle1" mb={-1}>
-                    Provincial Tourism Office
-                  </Typography>
-                  <Typography variant="h6" mb={-1}>
-                    Mutya san Ibabao 2023
-                  </Typography> */}
-                  <Typography variant="h6" mb={-1}>
-                    Talent Competition Score Sheet
-                  </Typography>
-                </>
-              }
-            />
-
             <DialogActions>
-              <Button onClick={handlePrint} variant="contained">
-                Print
-              </Button>
-              <ButtonCancel handleClose={handleCloseEvent} />
+              {contestants.length > 0 && categories.length > 0 ? (
+                <>
+                  {contestants.length > 0 && categories.length > 0 ? (
+                    <PerJudgeScore
+                      tableRef={tableRef}
+                      categories={categories}
+                      contestants={contestants}
+                      categoryTitle={categoryTitle}
+                      judgeId={judgeIdIne}
+                      judgeName={judgeName}
+                      handlePrint={handlePrint}
+                    />
+                  ) : (
+                    <div>Loading...</div>
+                  )}
+                  <Button onClick={handlePrint} variant="contained">
+                    Print
+                  </Button>
+                  <ButtonCancel handleClose={handleCloseEvent} />
+                </>
+              ) : (
+                <div>Loading...</div>
+              )}
             </DialogActions>
           </DialogContent>
         </Dialog>
@@ -156,4 +177,4 @@ const PerSubEventScoreDialog = ({ openEvent, handleCloseEvent }) => {
   );
 };
 
-export default PerSubEventScoreDialog;
+export default PerJudgeScoreDialog;

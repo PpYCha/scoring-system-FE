@@ -36,14 +36,14 @@ import actionHelper from "../../context/actionHelper";
 
 import { indexContestantsEvents } from "../../api/contestantEventController";
 import OverallReport from "./OverallReport";
+import { indexCriterias } from "../../api/criteriaController";
 
-const OverallScoreDialog = ({ openEvent, handleCloseEvent }) => {
+const OverallScoreDialog = ({ openEvent, handleCloseEvent, subEventid }) => {
   const [categories, setCategories] = useState([{}]);
   const [contestants, setContestants] = useState([]);
-  const [scores, setScores] = useState([{}]);
-  const [open, setOpen] = useState(false);
+
   const [loading, setLoading] = useState(false);
-  const [loadReport, setLoadReport] = useState(true);
+
   const tableRef = useRef();
 
   const {
@@ -56,18 +56,24 @@ const OverallScoreDialog = ({ openEvent, handleCloseEvent }) => {
   useEffect(() => {
     fetch();
   }, [openEvent]);
-
   const fetch = async () => {
-    // dispatch({ type: actions.START_LOADING });
     setLoading(true);
+    const [resContestant, resCategories, resScore, resCriteria] =
+      await Promise.all([
+        indexContestants(),
+        indexCategories(),
+        indexScores(),
+        indexCriterias(),
+      ]);
 
-    const [resContestant, resCategories, resScore] = await Promise.all([
-      indexContestants(),
-      indexCategories(),
-      indexScores(),
-    ]);
+    const sortedContestants = resContestant.sort((a, b) => {
+      const contestantNumberA = Number(a.cotestant_number);
+      const contestantNumberB = Number(b.cotestant_number);
 
-    const combinedData = resContestant.map((contestant) => {
+      return contestantNumberA - contestantNumberB;
+    });
+
+    const combinedData = sortedContestants.map((contestant) => {
       const contestantScores = resScore.filter(
         (score) => score.contestant_id === contestant.id
       );
@@ -82,6 +88,7 @@ const OverallScoreDialog = ({ openEvent, handleCloseEvent }) => {
             category_id: categoryId,
             scores: [],
             totalScore: 0,
+            criteria: {}, // Object to store criteria scores
           };
         }
 
@@ -89,34 +96,81 @@ const OverallScoreDialog = ({ openEvent, handleCloseEvent }) => {
           score_id: score.id,
           judge: score.judge_id,
           score: score.score,
+          criteria_id: score.criteria_id,
         });
 
-        categoryScores[categoryId].totalScore += parseInt(score.score);
+        categoryScores[categoryId].totalScore += parseFloat(score.score);
+
+        // Store criteria scores
+        const criteriaId = score.criteria_id;
+        if (!categoryScores[categoryId].criteria[criteriaId]) {
+          categoryScores[categoryId].criteria[criteriaId] = [];
+        }
+
+        categoryScores[categoryId].criteria[criteriaId].push({
+          judge: score.judge_id,
+          score: score.score,
+        });
       });
 
       const categories = Object.values(categoryScores);
 
+      // Calculate overall score for each category
+      categories.forEach((category, index) => {
+        const { scores, totalScore, criteria } = category;
+
+        // Calculate average score for each criterion
+        Object.values(criteria).forEach((criterion) => {
+          const criterionScores = criterion.map((score) =>
+            parseFloat(score.score)
+          );
+          const criterionAverage =
+            criterionScores.reduce((a, b) => a + b, 0) / criterionScores.length;
+          criterion.averageScore = criterionAverage;
+        });
+
+        const overallScore = totalScore;
+        category.overallScore = overallScore;
+      });
+
+      // Calculate sum of average scores for each category
+      const sumOfAverageScores = categories.reduce((sum, category) => {
+        return (
+          sum +
+          Object.values(category.criteria).reduce((criterionSum, criterion) => {
+            return criterionSum + criterion.averageScore;
+          }, 0)
+        );
+      }, 0);
+
       return {
         ...contestant,
         categories,
+        sumOfAverageScores,
       };
     });
 
-    // const filteredCategories = resCategories.filter(
-    //   (item) => item.subEvent_id === contestant.subEvent_id
-    // );
+    combinedData.reduce((acc, item) => {
+      item.categories.forEach((category) => {
+        const criteria = category.criteria;
+        Object.keys(criteria).forEach((criterionId) => {
+          const criterion = criteria[criterionId];
+          const averageScore = criterion.averageScore;
+          criterion.averageScore = averageScore;
+        });
+      });
+      return acc;
+    }, []);
+    console.log(combinedData);
 
-    const sortedContestants = combinedData.sort((a, b) => {
-      const contestantNumberA = Number(a.cotestant_number);
-      const contestantNumberB = Number(b.cotestant_number);
+    const filteredCategories = resCategories.filter(
+      (item) => item.subEvent_id === 2
+    );
 
-      return contestantNumberA - contestantNumberB;
-    });
+    setContestants(combinedData);
+    setCategories(filteredCategories);
 
-    setContestants(sortedContestants);
-    setCategories(resCategories);
-    // dispatch({ type: actions.END_LOADING });
-
+    console.log(filteredCategories.categories);
     setLoading(false);
   };
 

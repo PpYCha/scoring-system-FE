@@ -138,6 +138,19 @@ const reducer = (state, action) => {
             cotestant_number: "",
           },
         };
+      case actions.UPDATE_JUDGEID:
+        return {
+          ...state,
+          judge: { ...state.judge, ...action.payload },
+        };
+
+      case actions.RESET_JUDGEID:
+        return {
+          ...state,
+          judge: {
+            id: "",
+          },
+        };
 
       default:
         throw new Error("Invalid action type!");
